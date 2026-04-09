@@ -1,0 +1,28 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Runtime data
+dist
+dist-ssr
+
+# Dependencies
+node_modules/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS files
+.DS_Store
+Thumbs.db
