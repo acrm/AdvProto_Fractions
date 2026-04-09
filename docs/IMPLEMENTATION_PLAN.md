@@ -19,6 +19,7 @@ Status: in progress
 - [x] Implement relationship and intel baseline.
 - [ ] Add seasonal doctrine generation from objectives, relationships, and trajectories.
 - [ ] Add anti-exploit formulas as explicit tunable parameters.
+- [ ] Extend deterministic content generation for events, contacts, and frontier incidents.
 - [ ] Add domain unit tests for transitions and invariants.
 
 ### 2. Application Orchestration
@@ -26,6 +27,7 @@ Status: in progress
 - [x] Add Zustand game store.
 - [x] Add actions for strategy selection and session advance.
 - [x] Wire persistence for game state snapshots.
+- [x] Invalidate incompatible pre-narrative saves to guarantee canonical faction profiles.
 - [ ] Add doctrine vs override divergence selectors.
 - [ ] Add doctrine re-evaluation triggers from high-confidence contradictory intel.
 - [ ] Add game commands for explicit progress and sabotage targeting.
@@ -37,6 +39,7 @@ Status: in progress
 - [x] Add strategy controls and session run action.
 - [x] Add phase-space chart with five axes.
 - [x] Add status, objective, intel, and log panels.
+- [x] Add narrative briefing, faction doctrine, and flavored objective/intel text to the tactical panel.
 - [ ] Add seasonal doctrine recommendation panel with override comparison.
 - [ ] Add divergence indicators (magnitude and projected cost deltas).
 - [ ] Add objective planning UI with target selection.

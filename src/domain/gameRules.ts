@@ -19,17 +19,8 @@ import {
   SessionOutcome,
   TurnForecast,
 } from './gameModel'
+import { createIntelFlavor, createObjectiveFlavor, createSeasonBriefing, createSessionNarrative, getFactionSeed } from './flavorGenerator'
 import { createSeededRandom } from '../infrastructure/seededRandom'
-
-const FACTION_NAMES = [
-  'Helios Combine',
-  'Noctis Assembly',
-  'Verdant Compact',
-  'Iron Covenant',
-  'Azure League',
-  'Obsidian Circle',
-  'Saffron Bureau',
-]
 
 const OBJECTIVE_TYPES: ObjectiveType[] = ['influence', 'control', 'resource', 'elimination', 'positioning']
 const OBJECTIVE_PRIORITIES: ObjectivePriority[] = ['critical', 'high', 'medium', 'low']
@@ -181,7 +172,8 @@ function initialFactionVectors(index: number, isPlayer: boolean): ActivityVector
 }
 
 function createFaction(index: number, factionCount: number): Faction {
-  const name = FACTION_NAMES[index] ?? `Faction ${index + 1}`
+  const factionSeed = getFactionSeed(index)
+  const name = factionSeed.name ?? `Faction ${index + 1}`
   const isPlayer = index === factionCount - 1
   const initialVectors = initialFactionVectors(index, isPlayer)
 
@@ -189,6 +181,7 @@ function createFaction(index: number, factionCount: number): Faction {
     id: `f${index + 1}`,
     name: isPlayer ? `${name} (Player)` : name,
     isPlayer,
+    profile: factionSeed.profile,
     powerBase: isPlayer ? 52 : 62,
     agility: isPlayer ? 74 : 56,
     influence: isPlayer ? 58 : 60,
@@ -228,7 +221,7 @@ function generateObjectives(factions: Faction[], seed: number, seasonNumber: num
     for (let index = 0; index < count; index += 1) {
       const priority = OBJECTIVE_PRIORITIES[rng.nextInt(0, OBJECTIVE_PRIORITIES.length - 1)]
       const numeric = priorityToNumbers(priority)
-      objectives.push({
+      const objective: Objective = {
         id: `${faction.id}-s${seasonNumber}-o${index + 1}`,
         factionId: faction.id,
         type: OBJECTIVE_TYPES[rng.nextInt(0, OBJECTIVE_TYPES.length - 1)],
@@ -237,6 +230,11 @@ function generateObjectives(factions: Faction[], seed: number, seasonNumber: num
         reward: numeric.reward,
         visibility: faction.isPlayer ? 'public' : OBJECTIVE_VISIBILITY[rng.nextInt(0, OBJECTIVE_VISIBILITY.length - 1)],
         status: 'pending',
+      }
+
+      objectives.push({
+        ...objective,
+        ...createObjectiveFlavor(objective, faction, seed + seasonNumber * 101 + index * 17),
       })
     }
   })
@@ -268,6 +266,7 @@ function generateConflicts(objectives: Objective[], factions: Faction[], seed: n
 function createSeason(seed: number, seasonNumber: number, factions: Faction[], maxSessions: number): SeasonState {
   const objectives = generateObjectives(factions, seed, seasonNumber)
   const conflicts = generateConflicts(objectives, factions, seed, seasonNumber)
+  const briefing = createSeasonBriefing(seasonNumber, factions, seed)
 
   return {
     seasonNumber,
@@ -276,7 +275,8 @@ function createSeason(seed: number, seasonNumber: number, factions: Faction[], m
     objectives,
     conflicts,
     intel: [],
-    logs: [`Season ${seasonNumber} initialized with ${objectives.length} objectives.`],
+    logs: [briefing],
+    briefing,
   }
 }
 
@@ -429,17 +429,19 @@ function buildIntelItem(season: SeasonState, factions: Faction[], seed: number):
   const confidence = clamp(rng.next(), 0.3, 0.95)
   const reliability = clamp(rng.next(), 0.35, 0.98)
   const deceptive = reliability < 0.55 && rng.next() > 0.65
-
-  return {
+  const intel: IntelItem = {
     id: `intel-s${season.seasonNumber}-${season.sessionIndex}-${target.id}`,
     aboutFactionId: target.id,
     confidence,
     reliability,
     isDeceptive: deceptive,
     sessionDiscovered: season.sessionIndex,
-    message: deceptive
-      ? `${target.name} appears cooperative, but the source might be compromised.`
-      : `${target.name} is preparing pressure operations for next session.`,
+    message: '',
+  }
+
+  return {
+    ...intel,
+    ...createIntelFlavor(intel, target, seed),
   }
 }
 
@@ -466,7 +468,7 @@ function updateRelationships(relationships: RelationshipEdge[], seed: number): R
 
 export function createDefaultGameConfig(): GameConfig {
   return {
-    factionCount: 4,
+    factionCount: 6,
     campaignSeasons: 6,
     sessionsPerSeason: 4,
   }
@@ -533,7 +535,15 @@ export function runSession(state: GameState, strategy: PlayerStrategy, playerInt
   const seasonComplete = nextSessionIndex > season.maxSessions
   const nextRelationships = updateRelationships(state.relationships, seasonSeed + 71)
 
-  const logLine = `Season ${season.seasonNumber}, Session ${season.sessionIndex}: progress=${resolution.progressedObjectives}, sabotage=${resolution.sabotagedObjectives}, strategy=${strategy}`
+  const narrativeOutcome: SessionOutcome = {
+    summary: '',
+    progressedObjectives: resolution.progressedObjectives,
+    sabotagedObjectives: resolution.sabotagedObjectives,
+    playerExposureDelta: nextExposureDelta,
+  }
+  const logLine = playerFaction
+    ? createSessionNarrative(narrativeOutcome, playerFaction, strategy, seasonSeed)
+    : `Season ${season.seasonNumber}, Session ${season.sessionIndex}: progress=${resolution.progressedObjectives}, sabotage=${resolution.sabotagedObjectives}, strategy=${strategy}`
 
   let nextState: GameState
 

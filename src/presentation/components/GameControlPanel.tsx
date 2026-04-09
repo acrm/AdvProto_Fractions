@@ -52,6 +52,7 @@ export function GameControlPanel({
           <p className="subline">
             Session {gameState.seasonState.sessionIndex}/{gameState.seasonState.maxSessions}
           </p>
+          <p className="panel-note">{gameState.seasonState.briefing}</p>
         </div>
         <div className="hud-grid">
           <div>
@@ -138,6 +139,9 @@ export function GameControlPanel({
       <section className="panel-section">
         <p className="eyebrow">Faction Focus</p>
         <h3>{selectedFaction.name}</h3>
+        <p className="panel-note">{selectedFaction.profile.doctrine}</p>
+        <p className="panel-note">Led by {selectedFaction.profile.leaderName} from {selectedFaction.profile.homeBase}.</p>
+        <p className="panel-note">Current agenda: {selectedFaction.profile.agenda}</p>
         <div className="detail-grid">
           <div>
             <span className="hud-label">Power Base</span>
@@ -159,7 +163,8 @@ export function GameControlPanel({
         <ul className="compact-list">
           {selectedObjectives.map((objective) => (
             <li key={objective.id}>
-              <strong>{objective.type}</strong> • {objective.priority} • {objective.status}
+              <strong>{objective.title ?? objective.type}</strong> • {objective.priority} • {objective.status}
+              {objective.summary ? <div className="compact-subline">{objective.summary}</div> : null}
             </li>
           ))}
         </ul>
@@ -171,7 +176,8 @@ export function GameControlPanel({
           <ul className="compact-list">
             {recentIntel.map((intel) => (
               <li key={intel.id}>
-                {intel.message} ({intel.confidence.toFixed(2)})
+                <strong>{intel.sourceName ?? 'Unknown source'}</strong>: {intel.message}
+                <div className="compact-subline">{intel.locationName ?? 'Unknown location'} • confidence {intel.confidence.toFixed(2)}</div>
               </li>
             ))}
           </ul>

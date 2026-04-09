@@ -31,6 +31,14 @@ Enable GitHub Pages:
 
 Public URL: `https://acrm.github.io/AdvProto_Fractions/`
 
+## Setting Docs
+
+- `docs/LORE.md` — world premise and tone.
+- `docs/FACTIONS.md` — faction bibles and player guild role.
+- `docs/LOCATIONS.md` — recurring frontier locations.
+- `docs/VECTOR_SEMANTICS.md` — diegetic interpretation of simulation axes.
+- `docs/NARRATIVE_LAYER.md` — rules for concise atmospheric storytelling.
+
 ## Architecture
 
 Clean/DDD layers:
@@ -42,7 +50,7 @@ Clean/DDD layers:
 ## Current Prototype Features
 
 - Seasonal loop with deterministic seeded simulation.
-- 4 active factions in MVP baseline.
+- 5 major frontier factions plus the player-run Grey Lantern Guild in the default baseline.
 - 3 to 5 objectives generated per faction each season.
 - Objective conflict classes: compatible, contested, mutually-exclusive.
 - Full single-screen tactical interface.
@@ -54,6 +62,7 @@ Clean/DDD layers:
 - Seasonal doctrine concept documented as an advisory recommendation layer.
 - Explicit player override authority for doctrine divergence and tactical pivots.
 - Intel and deception signals designed to justify mid-season recommendation changes.
+- Nor's Gate narrative layer with faction doctrines, named locations, contact-sourced intel, and atmospheric session aftermath text.
 
 ## PWA
 

@@ -7,11 +7,14 @@
 - [x] Seasonal/session simulation baseline
 - [x] Application game store and persistence
 - [x] Base phase-space shell UI
+- [x] Nor's Gate faction identities, location seeds, and narrative flavor scaffolding
 - [ ] Seasonal doctrine recommendation generation
 - [ ] Doctrine vs override divergence tracking
 - [ ] Intel-confidence-driven pivot prompts
 - [ ] Objective targeting interactions for player actions
 - [ ] Relationship graph panel
+- [ ] Narrative labels and location overlays on the tactical board
+- [ ] Persistent contact roster and faction-facing rumors
 - [ ] Deterministic replay inspector
 - [ ] Domain tests for conflict and transition rules
 

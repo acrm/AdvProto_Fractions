@@ -34,10 +34,22 @@ export type ObjectiveStatus = 'pending' | 'succeeded' | 'failed'
 
 export type CompatibilityClass = 'compatible' | 'contested' | 'mutually-exclusive'
 
+export type FactionSphere = 'political' | 'religious' | 'economic' | 'scientific' | 'military' | 'guild'
+
+export interface FactionProfile {
+  sphere: FactionSphere
+  leaderName: string
+  doctrine: string
+  methods: string
+  homeBase: string
+  agenda: string
+}
+
 export interface Faction {
   id: string
   name: string
   isPlayer: boolean
+  profile: FactionProfile
   powerBase: number
   agility: number
   influence: number
@@ -65,6 +77,9 @@ export interface Objective {
   reward: number
   visibility: ObjectiveVisibility
   status: ObjectiveStatus
+  title?: string
+  summary?: string
+  locationName?: string
 }
 
 export interface ObjectiveConflict {
@@ -81,6 +96,8 @@ export interface IntelItem {
   isDeceptive: boolean
   sessionDiscovered: number
   message: string
+  sourceName?: string
+  locationName?: string
 }
 
 export interface SeasonState {
@@ -91,6 +108,7 @@ export interface SeasonState {
   conflicts: ObjectiveConflict[]
   intel: IntelItem[]
   logs: string[]
+  briefing?: string
 }
 
 export interface GameConfig {

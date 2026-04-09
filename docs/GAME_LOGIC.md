@@ -4,6 +4,7 @@ Phase Dominion is a seasonal multi-faction strategy game.
 
 ## Campaign Structure
 - 3 to 7 factions can be active at runtime.
+- The default campaign uses 5 major frontier powers plus the player-run Grey Lantern Guild.
 - The player controls the most agile, non-dominant faction.
 - A campaign runs through multiple seasons.
 - Each season runs 4 sessions in MVP.
@@ -39,6 +40,7 @@ Forecast requirements:
 - Intel items are discovered through session progress.
 - Each intel item stores confidence and reliability.
 - Deceptive intel is possible and explicitly modeled.
+- Intel should be phrased as short diegetic reports tied to contacts and locations in the Nor's Gate frontier.
 - Contradictory high-confidence intel should trigger a doctrine review prompt.
 
 ## Five Activity Vectors
@@ -61,6 +63,7 @@ All factions are represented in a phase-space with vectors in range -100 to 100:
 
 ## Command Panel Rules
 - The right panel combines campaign summary, selected faction detail, recent intel, and resolution feed.
+- It should foreground faction doctrine, home base, leadership, and current agenda alongside raw metrics.
 - The player can set signed intent values for each of the 5 vectors before resolving the next session.
 - A deterministic forecast shows projected player vectors, resource delta, exposure delta, and score pressure.
 
@@ -72,8 +75,9 @@ All factions are represented in a phase-space with vectors in range -100 to 100:
 These rules are friction constraints, not mandatory strategic rails. They shape cost landscapes while preserving player agency and roleplay viability.
 
 ## MVP Scope
-- 4 factions.
+- 5 major factions plus the player guild.
 - 6 campaign seasons.
 - 4 sessions per season.
 - Deterministic seed-based simulation.
 - Base phase-space visualization and session shell.
+- Narrative flavor layer for briefings, objectives, intel, and session aftermath.
