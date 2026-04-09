@@ -1,12 +1,18 @@
+import { useState } from 'react'
+import type { PointerEvent as ReactPointerEvent, WheelEvent as ReactWheelEvent } from 'react'
 import { ActivityVectorState, Faction } from '../../domain/gameModel'
 
 interface PhaseSpaceChartProps {
   factions: Faction[]
-  isPrimary?: boolean
+  selectedFactionId: string
+  onSelectFaction: (factionId: string) => void
 }
 
 const COLORS = ['#005f73', '#ee9b00', '#9b2226', '#3a86ff', '#2a9d8f', '#6a4c93', '#ef476f']
 const TRAJECTORY_TAIL = 5
+const VIEWBOX_SIZE = 1000
+const VIEWBOX_CENTER = VIEWBOX_SIZE / 2
+const BASE_RADIUS = 360
 
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value))
@@ -34,6 +40,12 @@ function projectRelativePoint(
     x: center + xNorm * radius,
     y: center - yNorm * radius,
   }
+}
+
+function pointRadius(resourceStock: number, maxResource: number): number {
+  const safeMax = Math.max(1, maxResource)
+  const normalized = Math.log(resourceStock + 1) / Math.log(safeMax + 1)
+  return 7 + normalized * 15
 }
 
 function trajectoryPoints(
@@ -67,12 +79,12 @@ function trajectoryPoints(
   return points
 }
 
-export function PhaseSpaceChart({ factions, isPrimary = false }: PhaseSpaceChartProps) {
-  const size = isPrimary ? 760 : 420
-  const center = size / 2
-  const radius = isPrimary ? 280 : 150
-  const axisPad = isPrimary ? 24 : 16
+export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }: PhaseSpaceChartProps) {
+  const [zoom, setZoom] = useState(1)
+  const [pan, setPan] = useState({ x: 0, y: 0 })
+  const [dragState, setDragState] = useState({ active: false, x: 0, y: 0, originX: 0, originY: 0 })
   const playerFaction = factions.find((faction) => faction.isPlayer)
+  const maxResource = Math.max(...factions.map((faction) => faction.resourceStock), 1)
 
   if (!playerFaction) {
     return (
@@ -83,53 +95,100 @@ export function PhaseSpaceChart({ factions, isPrimary = false }: PhaseSpaceChart
     )
   }
 
+  const handleWheel = (event: ReactWheelEvent<SVGSVGElement>) => {
+    event.preventDefault()
+    setZoom((current) => clamp(current + (event.deltaY > 0 ? -0.12 : 0.12), 0.65, 2.4))
+  }
+
+  const handlePointerDown = (event: ReactPointerEvent<SVGSVGElement>) => {
+    setDragState({
+      active: true,
+      x: event.clientX,
+      y: event.clientY,
+      originX: pan.x,
+      originY: pan.y,
+    })
+  }
+
+  const handlePointerMove = (event: ReactPointerEvent<SVGSVGElement>) => {
+    if (!dragState.active) return
+    setPan({
+      x: dragState.originX + (event.clientX - dragState.x),
+      y: dragState.originY + (event.clientY - dragState.y),
+    })
+  }
+
+  const handlePointerUp = () => {
+    setDragState((current) => ({ ...current, active: false }))
+  }
+
   return (
-    <div className={`phase-card ${isPrimary ? 'phase-card-primary' : ''}`.trim()}>
-      <h3>Phase Space</h3>
-      <p className="phase-subtitle">Player-centered projection. Dots show current stance, tails show last 5 sessions.</p>
+    <div className="phase-board">
+      <div className="phase-board-head">
+        <div>
+          <p className="eyebrow">Strategic Space</p>
+          <h2>Faction Phase Board</h2>
+        </div>
+        <div className="phase-board-meta">
+          <span>Wheel to zoom</span>
+          <span>Drag to pan</span>
+          <span>Click point or trail to select</span>
+        </div>
+      </div>
       <svg
         width="100%"
         height="auto"
-        viewBox={`0 0 ${size} ${size}`}
+        viewBox={`0 0 ${VIEWBOX_SIZE} ${VIEWBOX_SIZE}`}
         role="img"
         aria-label="Faction activity phase space chart centered on player position"
+        onWheel={handleWheel}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerLeave={handlePointerUp}
       >
+        <rect x={0} y={0} width={VIEWBOX_SIZE} height={VIEWBOX_SIZE} fill="#030712" rx={28} />
+        <g transform={`translate(${pan.x}, ${pan.y}) scale(${zoom})`}>
         {[0.25, 0.5, 0.75, 1].map((ratio) => (
           <circle
             key={ratio}
-            cx={center}
-            cy={center}
-            r={radius * ratio}
+            cx={VIEWBOX_CENTER}
+            cy={VIEWBOX_CENTER}
+            r={BASE_RADIUS * ratio}
             fill="none"
-            stroke="#d7dee3"
+            stroke="#183046"
             strokeWidth={1}
           />
         ))}
 
-        <line x1={center - radius} y1={center} x2={center + radius} y2={center} stroke="#aab7c4" strokeWidth={1.2} />
-        <line x1={center} y1={center - radius} x2={center} y2={center + radius} stroke="#aab7c4" strokeWidth={1.2} />
+        <line x1={VIEWBOX_CENTER - BASE_RADIUS} y1={VIEWBOX_CENTER} x2={VIEWBOX_CENTER + BASE_RADIUS} y2={VIEWBOX_CENTER} stroke="#26455f" strokeWidth={1.2} />
+        <line x1={VIEWBOX_CENTER} y1={VIEWBOX_CENTER - BASE_RADIUS} x2={VIEWBOX_CENTER} y2={VIEWBOX_CENTER + BASE_RADIUS} stroke="#26455f" strokeWidth={1.2} />
 
-        <text x={center + radius + axisPad} y={center + 4} fontSize={isPrimary ? 15 : 13} fill="#1f2937">
+        <text x={VIEWBOX_CENTER + BASE_RADIUS + 18} y={VIEWBOX_CENTER + 5} fontSize={15} fill="#d0d8e6">
           +Economic / +Diplomatic
         </text>
-        <text x={center - radius - axisPad} y={center + 4} textAnchor="end" fontSize={isPrimary ? 15 : 13} fill="#1f2937">
+        <text x={VIEWBOX_CENTER - BASE_RADIUS - 18} y={VIEWBOX_CENTER + 5} textAnchor="end" fontSize={15} fill="#d0d8e6">
           -Economic / -Diplomatic
         </text>
-        <text x={center + 2} y={center - radius - axisPad} textAnchor="middle" fontSize={isPrimary ? 15 : 13} fill="#1f2937">
+        <text x={VIEWBOX_CENTER + 2} y={VIEWBOX_CENTER - BASE_RADIUS - 18} textAnchor="middle" fontSize={15} fill="#d0d8e6">
           +Covert / +Deterrence
         </text>
-        <text x={center + 2} y={center + radius + axisPad} textAnchor="middle" fontSize={isPrimary ? 15 : 13} fill="#1f2937">
+        <text x={VIEWBOX_CENTER + 2} y={VIEWBOX_CENTER + BASE_RADIUS + 24} textAnchor="middle" fontSize={15} fill="#d0d8e6">
           -Covert / -Deterrence
         </text>
 
-        <circle cx={center} cy={center} r={isPrimary ? 9 : 7} fill="#111827" stroke="#ffffff" strokeWidth={2} />
-        <text x={center + 14} y={center - 12} fontSize={isPrimary ? 14 : 12} fill="#111827">Player Origin</text>
+        <circle cx={VIEWBOX_CENTER} cy={VIEWBOX_CENTER} r={10} fill="#030712" stroke={selectedFactionId === playerFaction.id ? '#f8fafc' : '#60a5fa'} strokeWidth={2.5} />
+        <circle cx={VIEWBOX_CENTER} cy={VIEWBOX_CENTER} r={18} fill="none" stroke={selectedFactionId === playerFaction.id ? '#f59e0b' : '#22d3ee'} strokeWidth={3.2} strokeOpacity={0.95} />
+        <text x={VIEWBOX_CENTER + 28} y={VIEWBOX_CENTER - 22} fontSize={15} fill="#f8fafc">Player faction</text>
 
         {factions.map((faction, index) => (
           <g key={faction.id}>
             {!faction.isPlayer && (() => {
-              const points = trajectoryPoints(faction, playerFaction, radius, center)
+              const points = trajectoryPoints(faction, playerFaction, BASE_RADIUS, VIEWBOX_CENTER)
               if (points.length === 0) return null
+              const highlight = selectedFactionId === faction.id
+              const currentPoint = points[points.length - 1]
+              const radius = pointRadius(faction.resourceStock, maxResource)
 
               return (
                 <>
@@ -137,32 +196,58 @@ export function PhaseSpaceChart({ factions, isPrimary = false }: PhaseSpaceChart
                     points={points.map((point) => `${point.x},${point.y}`).join(' ')}
                     fill="none"
                     stroke={COLORS[index % COLORS.length]}
-                    strokeWidth={2}
-                    strokeOpacity={0.45}
+                    strokeWidth={highlight ? 5 : 3}
+                    strokeOpacity={highlight ? 0.95 : 0.5}
+                  />
+                  <polyline
+                    points={points.map((point) => `${point.x},${point.y}`).join(' ')}
+                    fill="none"
+                    stroke="transparent"
+                    strokeWidth={20}
+                    onClick={() => onSelectFaction(faction.id)}
                   />
                   {points.map((point, pointIndex) => (
                     <circle
                       key={`${faction.id}-trail-${pointIndex}`}
                       cx={point.x}
                       cy={point.y}
-                      r={pointIndex === points.length - 1 ? (isPrimary ? 8 : 6) : (isPrimary ? 5 : 4)}
+                      r={pointIndex === points.length - 1 ? radius : Math.max(3, radius * 0.48)}
                       fill={COLORS[index % COLORS.length]}
                       fillOpacity={point.opacity}
-                      stroke="#ffffff"
-                      strokeWidth={pointIndex === points.length - 1 ? 1.8 : 1.2}
+                      stroke={highlight ? '#f8fafc' : '#dbeafe'}
+                      strokeWidth={pointIndex === points.length - 1 ? 2.3 : 1.2}
+                      onClick={() => onSelectFaction(faction.id)}
                     />
                   ))}
+                  {highlight ? (
+                    <>
+                      <circle
+                        cx={currentPoint.x}
+                        cy={currentPoint.y}
+                        r={radius + 7}
+                        fill="none"
+                        stroke="#f59e0b"
+                        strokeWidth={2.4}
+                      />
+                      <text x={currentPoint.x + radius + 12} y={currentPoint.y - radius - 8} fontSize={15} fill="#f8fafc">
+                        {faction.name}
+                      </text>
+                    </>
+                  ) : null}
                 </>
               )
             })()}
           </g>
         ))}
+        </g>
       </svg>
       <ul className="legend-list">
         {factions.map((faction, index) => (
-          <li key={faction.id}>
-            <span className="legend-chip" style={{ background: faction.isPlayer ? '#111827' : COLORS[index % COLORS.length] }} />
-            {faction.name} {faction.isPlayer ? '(origin)' : ''}
+          <li key={faction.id} className={selectedFactionId === faction.id ? 'legend-active' : ''}>
+            <button type="button" className="legend-button" onClick={() => onSelectFaction(faction.id)}>
+              <span className="legend-chip" style={{ background: faction.isPlayer ? '#111827' : COLORS[index % COLORS.length] }} />
+              {faction.name} {faction.isPlayer ? '(origin)' : ''}
+            </button>
           </li>
         ))}
       </ul>

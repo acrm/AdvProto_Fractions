@@ -1,4 +1,5 @@
 import {
+  ActivityVectorState,
   CompatibilityClass,
   Faction,
   GameConfig,
@@ -9,12 +10,14 @@ import {
   ObjectiveConflict,
   ObjectivePriority,
   ObjectiveType,
+  PlayerIntent,
   ObjectiveVisibility,
   PlayerStrategy,
   RelationshipEdge,
   RelationshipState,
   SeasonState,
   SessionOutcome,
+  TurnForecast,
 } from './gameModel'
 import { createSeededRandom } from '../infrastructure/seededRandom'
 
@@ -58,7 +61,7 @@ function priorityToNumbers(priority: ObjectivePriority): { cost: number; reward:
   return { cost: 5, reward: 8 }
 }
 
-function createBaseVectors(): Faction['vectors'] {
+export function createZeroVectorState(): ActivityVectorState {
   return {
     territorialPressure: 0,
     diplomaticMomentum: 0,
@@ -66,6 +69,58 @@ function createBaseVectors(): Faction['vectors'] {
     covertTempo: 0,
     deterrencePosture: 0,
   }
+}
+
+export function createEmptyPlayerIntent(): PlayerIntent {
+  return {
+    adjustments: createZeroVectorState(),
+  }
+}
+
+function sumPositiveIntent(intent: PlayerIntent): number {
+  return Object.values(intent.adjustments).reduce((total, value) => total + Math.max(0, value), 0)
+}
+
+function sumNegativeIntent(intent: PlayerIntent): number {
+  return Object.values(intent.adjustments).reduce((total, value) => total + Math.abs(Math.min(0, value)), 0)
+}
+
+export function deriveStrategyFromIntent(intent: PlayerIntent): PlayerStrategy {
+  const progressBias =
+    intent.adjustments.territorialPressure +
+    intent.adjustments.diplomaticMomentum +
+    intent.adjustments.economicThroughput
+
+  const sabotageBias =
+    intent.adjustments.covertTempo +
+    intent.adjustments.deterrencePosture -
+    Math.min(0, intent.adjustments.diplomaticMomentum)
+
+  if (sabotageBias - progressBias >= 8) return 'sabotage'
+  if (progressBias - sabotageBias >= 8) return 'progress'
+  return 'balanced'
+}
+
+function intentResourceDelta(intent: PlayerIntent): number {
+  const gross = sumPositiveIntent(intent) + sumNegativeIntent(intent)
+  return -Math.max(4, Math.round(gross / 3))
+}
+
+function intentExposureDelta(intent: PlayerIntent, strategy: PlayerStrategy): number {
+  const covertWeight = Math.max(0, intent.adjustments.covertTempo)
+  const deterrenceWeight = Math.max(0, intent.adjustments.deterrencePosture)
+  const diplomaticRelief = Math.max(0, intent.adjustments.diplomaticMomentum)
+  const base = strategy === 'sabotage' ? 5 : strategy === 'progress' ? 2 : 3
+  return Math.max(1, Math.round(base + covertWeight / 4 + deterrenceWeight / 8 - diplomaticRelief / 10))
+}
+
+function intentScorePressure(intent: PlayerIntent): number {
+  return Math.round(
+    intent.adjustments.territorialPressure * 0.4 +
+    intent.adjustments.economicThroughput * 0.4 +
+    intent.adjustments.diplomaticMomentum * 0.2 +
+    intent.adjustments.covertTempo * 0.15,
+  )
 }
 
 function createFaction(index: number, factionCount: number): Faction {
@@ -82,8 +137,8 @@ function createFaction(index: number, factionCount: number): Faction {
     resourceStock: isPlayer ? 72 : 84,
     exposure: isPlayer ? 12 : 6,
     score: 0,
-    vectors: createBaseVectors(),
-    trajectory: [createBaseVectors()],
+    vectors: createZeroVectorState(),
+    trajectory: [createZeroVectorState()],
   }
 }
 
@@ -167,21 +222,56 @@ function createSeason(seed: number, seasonNumber: number, factions: Faction[], m
   }
 }
 
-function updateFactionVectors(faction: Faction, strategy: PlayerStrategy, rngSeed: number): Faction {
+function nextVectorState(
+  current: ActivityVectorState,
+  strategy: PlayerStrategy,
+  rngSeed: number,
+  intent?: PlayerIntent,
+): ActivityVectorState {
   const rng = createSeededRandom(rngSeed)
-  const nextVectors = { ...faction.vectors }
+  const nextVectors = { ...current }
+  const adjustments = intent?.adjustments ?? createZeroVectorState()
 
   const strategyBonus = strategy === 'progress' ? 8 : strategy === 'sabotage' ? -6 : 2
-  nextVectors.territorialPressure = clamp(nextVectors.territorialPressure + rng.nextInt(-6, 9) + strategyBonus, -100, 100)
-  nextVectors.diplomaticMomentum = clamp(nextVectors.diplomaticMomentum + rng.nextInt(-7, 8), -100, 100)
-  nextVectors.economicThroughput = clamp(nextVectors.economicThroughput + rng.nextInt(-6, 10), -100, 100)
-  nextVectors.covertTempo = clamp(nextVectors.covertTempo + rng.nextInt(-8, 12) + (strategy === 'sabotage' ? 10 : 0), -100, 100)
-  nextVectors.deterrencePosture = clamp(nextVectors.deterrencePosture + rng.nextInt(-5, 9), -100, 100)
+  nextVectors.territorialPressure = clamp(nextVectors.territorialPressure + rng.nextInt(-6, 9) + strategyBonus + adjustments.territorialPressure, -100, 100)
+  nextVectors.diplomaticMomentum = clamp(nextVectors.diplomaticMomentum + rng.nextInt(-7, 8) + adjustments.diplomaticMomentum, -100, 100)
+  nextVectors.economicThroughput = clamp(nextVectors.economicThroughput + rng.nextInt(-6, 10) + adjustments.economicThroughput, -100, 100)
+  nextVectors.covertTempo = clamp(nextVectors.covertTempo + rng.nextInt(-8, 12) + (strategy === 'sabotage' ? 10 : 0) + adjustments.covertTempo, -100, 100)
+  nextVectors.deterrencePosture = clamp(nextVectors.deterrencePosture + rng.nextInt(-5, 9) + adjustments.deterrencePosture, -100, 100)
+
+  return nextVectors
+}
+
+function updateFactionVectors(faction: Faction, strategy: PlayerStrategy, rngSeed: number, intent?: PlayerIntent): Faction {
+  const nextVectors = nextVectorState(faction.vectors, strategy, rngSeed, intent)
 
   return {
     ...faction,
     vectors: nextVectors,
     trajectory: [...faction.trajectory.slice(-5), nextVectors],
+  }
+}
+
+export function forecastPlayerTurn(state: GameState, intent: PlayerIntent): TurnForecast {
+  const playerFaction = state.factions.find((faction) => faction.isPlayer)
+  if (!playerFaction) {
+    return {
+      derivedStrategy: 'balanced',
+      projectedVectors: createZeroVectorState(),
+      resourceDelta: 0,
+      exposureDelta: 0,
+      scorePressure: 0,
+    }
+  }
+
+  const derivedStrategy = deriveStrategyFromIntent(intent)
+
+  return {
+    derivedStrategy,
+    projectedVectors: nextVectorState(playerFaction.vectors, derivedStrategy, state.seed + state.seasonState.sessionIndex * 17, intent),
+    resourceDelta: intentResourceDelta(intent),
+    exposureDelta: intentExposureDelta(intent, derivedStrategy),
+    scorePressure: intentScorePressure(intent),
   }
 }
 
@@ -339,7 +429,7 @@ export function createInitialGameState(seed: number, config: GameConfig = create
   }
 }
 
-export function runSession(state: GameState, strategy: PlayerStrategy): { nextState: GameState; outcome: SessionOutcome } {
+export function runSession(state: GameState, strategy: PlayerStrategy, playerIntent: PlayerIntent = createEmptyPlayerIntent()): { nextState: GameState; outcome: SessionOutcome } {
   if (state.completed) {
     return {
       nextState: state,
@@ -360,6 +450,7 @@ export function runSession(state: GameState, strategy: PlayerStrategy): { nextSt
       faction,
       faction.isPlayer ? strategy : 'balanced',
       seasonSeed + index * 13,
+      faction.isPlayer ? playerIntent : undefined,
     ),
   )
 
@@ -374,8 +465,9 @@ export function runSession(state: GameState, strategy: PlayerStrategy): { nextSt
   const nextIntel = [...season.intel, buildIntelItem(season, resolution.nextFactions, seasonSeed + 31)]
 
   const playerFaction = resolution.nextFactions.find((faction) => faction.isPlayer)
-  const nextExposureDelta = strategy === 'sabotage' ? 9 : strategy === 'progress' ? 3 : 5
+  const nextExposureDelta = intentExposureDelta(playerIntent, strategy)
   if (playerFaction) {
+    playerFaction.resourceStock = clamp(playerFaction.resourceStock + intentResourceDelta(playerIntent), 0, 200)
     playerFaction.exposure = clamp(playerFaction.exposure + nextExposureDelta, 0, 100)
   }
 

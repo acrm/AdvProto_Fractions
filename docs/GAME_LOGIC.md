@@ -11,7 +11,8 @@ Phase Dominion is a seasonal multi-faction strategy game.
 ## Session Resolution Rules
 - Every faction pursues 3 to 5 seasonal objectives.
 - Objective classes define interactions: compatible, contested, mutually-exclusive.
-- The player chooses a strategy posture each session: progress, balanced, sabotage.
+- The player sets a direct movement intent across all 5 activity vectors each session.
+- A derived stance (`progress`, `balanced`, `sabotage`) is inferred from that movement intent.
 - Session results update score, resources, exposure, vectors, and relationships.
 
 ## Information Rules
@@ -33,6 +34,14 @@ All factions are represented in a phase-space with vectors in range -100 to 100:
 - Every non-player faction is rendered as one current dot.
 - Every non-player faction also renders a trajectory tail for the last 5 sessions.
 - Projection uses a fixed linear mapping from 5D vectors into 2D to keep interpretation stable.
+- The chart is the primary tactical screen element and supports zoom, pan, and faction selection.
+- Dot radius represents faction resources on a logarithmic scale.
+- The player faction uses a persistent distinctive outline even when another faction is selected.
+
+## Command Panel Rules
+- The right panel combines campaign summary, selected faction detail, recent intel, and resolution feed.
+- The player can set signed intent values for each of the 5 vectors before resolving the next session.
+- A deterministic forecast shows projected player vectors, resource delta, exposure delta, and score pressure.
 
 ## Anti-Exploit Rules
 - Repeated sabotage raises exposure and retaliation risk.

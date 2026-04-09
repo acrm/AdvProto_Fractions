@@ -1,139 +1,126 @@
 #root {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 1.25rem;
+  width: 100%;
+  min-height: 100vh;
 }
 
-.shell {
+.game-screen {
   display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px;
   gap: 1rem;
+  min-height: 100vh;
+  padding: 1rem;
+  box-sizing: border-box;
 }
 
-.hero {
-  background: linear-gradient(135deg, #f8f2de 0%, #dbe9ff 100%);
-  border: 1px solid #c8d3e0;
-  border-radius: 12px;
-  padding: 1rem 1.2rem;
+.game-board-column {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 0.75rem;
+  min-height: 0;
 }
 
-.hero h1 {
+.board-topline {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  padding: 0.25rem 0.25rem 0 0.25rem;
+}
+
+.board-topline h1 {
   margin: 0;
-  color: #12263a;
+  color: #eff6ff;
 }
 
-.hero p {
-  margin: 0.4rem 0 0;
-  color: #2f3e46;
+.board-topline-meta {
+  display: flex;
+  gap: 0.75rem;
+  color: #8da2bd;
+  font-size: 0.9rem;
 }
 
-.controls-card,
-.status-card,
-.panel-card,
-.phase-card {
-  background: #ffffff;
-  border: 1px solid #d7dee3;
-  border-radius: 12px;
+.eyebrow {
+  margin: 0 0 0.2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.74rem;
+  color: #6ea8ff;
+}
+
+.subline,
+.panel-note,
+.outcome-line {
+  color: #94a3b8;
+}
+
+.phase-board,
+.game-side-panel {
+  border-radius: 18px;
+  border: 1px solid #1f2937;
+  background: linear-gradient(180deg, #09111f 0%, #060b14 100%);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+}
+
+.phase-board {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  min-height: 0;
   padding: 1rem;
 }
 
-.controls-card {
-  display: grid;
-  gap: 0.6rem;
-}
-
-.controls-card label {
-  font-weight: 600;
-}
-
-.controls-card select {
-  max-width: 240px;
-  padding: 0.4rem 0.5rem;
-}
-
-.controls-row {
+.phase-board-head {
   display: flex;
-  gap: 0.5rem;
+  justify-content: space-between;
+  align-items: end;
+  gap: 1rem;
+  color: #f8fafc;
+}
+
+.phase-board-head h2,
+.game-side-panel h2,
+.game-side-panel h3 {
+  margin: 0;
+  color: #f8fafc;
+}
+
+.phase-board-meta {
+  display: flex;
+  gap: 0.85rem;
   flex-wrap: wrap;
+  color: #93a6bf;
+  font-size: 0.9rem;
 }
 
-button {
-  background: #12344d;
-  color: #ffffff;
-  border: 0;
-  border-radius: 8px;
-  padding: 0.5rem 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.outcome-line {
-  margin: 0;
-  color: #34536b;
-}
-
-.status-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 0.75rem;
-}
-
-.phase-primary {
-  display: grid;
-}
-
-.panel-grid-secondary {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 0.75rem;
-  align-items: start;
-}
-
-.panel-card ul,
-.phase-card ul {
-  margin: 0;
-  padding-left: 1.1rem;
-}
-
-.panel-card li,
-.phase-card li {
-  margin-bottom: 0.25rem;
-}
-
-.phase-card {
-  display: grid;
-  justify-items: center;
-}
-
-.phase-card-primary {
+.phase-board svg {
+  display: block;
   width: 100%;
-}
-
-.phase-card-primary svg {
-  max-width: 980px;
-}
-
-.phase-subtitle {
-  margin: 0 0 0.5rem;
-  color: #3f5467;
-  text-align: center;
+  aspect-ratio: 1 / 1;
+  touch-action: none;
 }
 
 .legend-list {
   list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
   padding: 0;
-  margin-top: 0.4rem;
-  width: 100%;
+  margin: 0.85rem 0 0;
 }
 
-.legend-list li {
-  display: flex;
+.legend-button {
+  display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.55rem;
+  border: 1px solid #263548;
+  background: #0f172a;
+  color: #dbeafe;
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+  cursor: pointer;
+}
+
+.legend-active .legend-button {
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.25);
 }
 
 .legend-chip {
@@ -143,8 +130,137 @@ button:disabled {
   border-radius: 50%;
 }
 
-@media (max-width: 900px) {
-  .phase-card-primary svg {
-    max-width: 100%;
+.game-side-panel {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1rem;
+  overflow: auto;
+}
+
+.panel-section {
+  border: 1px solid #1f2d3d;
+  border-radius: 14px;
+  padding: 0.95rem;
+  background: rgba(7, 12, 24, 0.74);
+}
+
+.panel-section-header {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.hud-grid,
+.detail-grid,
+.forecast-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.hud-grid strong,
+.detail-grid strong,
+.forecast-grid strong {
+  color: #f8fafc;
+  display: block;
+}
+
+.hud-label {
+  display: block;
+  margin-bottom: 0.2rem;
+  font-size: 0.78rem;
+  color: #8ca1bb;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.section-heading-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.intent-list {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.intent-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) 54px 72px;
+  align-items: center;
+  gap: 0.6rem;
+  color: #d6e2f0;
+}
+
+.intent-row input[type='range'] {
+  width: 100%;
+}
+
+.intent-value,
+.intent-projection {
+  color: #93c5fd;
+  text-align: right;
+}
+
+.control-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.55rem;
+  margin-top: 0.9rem;
+}
+
+button {
+  background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
+  color: #eff6ff;
+  border: 0;
+  border-radius: 10px;
+  padding: 0.7rem 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ghost-button {
+  background: #111827;
+  border: 1px solid #2c3a4f;
+  color: #dbeafe;
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.compact-list {
+  margin: 0;
+  padding-left: 1rem;
+  color: #d6e2f0;
+}
+
+.compact-list li {
+  margin-bottom: 0.4rem;
+}
+
+.panel-section-split {
+  display: grid;
+  gap: 0.9rem;
+}
+
+@media (max-width: 1180px) {
+  .game-screen {
+    grid-template-columns: 1fr;
+  }
+
+  .game-side-panel {
+    max-height: none;
+  }
+
+  .control-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .intent-row {
+    grid-template-columns: 1fr;
   }
 }

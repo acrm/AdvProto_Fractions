@@ -28,10 +28,10 @@ infrastructure ← application (via interfaces)
 
 ### Domain
 - `src/domain/gameModel.ts` defines core entities and value ranges.
-- `src/domain/gameRules.ts` contains deterministic seasonal/session transition logic.
+- `src/domain/gameRules.ts` contains deterministic seasonal/session transition logic, player intent derivation, and forecast rules.
 
 ### Application
-- `src/application/useGameStore.ts` orchestrates game commands and state lifecycle.
+- `src/application/useGameStore.ts` orchestrates game commands, selected faction state, player intent state, and forecast lifecycle.
 
 ### Infrastructure
 - `src/infrastructure/seededRandom.ts` provides deterministic pseudo-random generation.
@@ -39,16 +39,18 @@ infrastructure ← application (via interfaces)
 
 ### Presentation
 - `src/presentation/pages/HomePage.tsx` hosts the game shell.
-- `src/presentation/components/PhaseSpaceChart.tsx` renders five-axis faction states.
+- `src/presentation/components/PhaseSpaceChart.tsx` renders the interactive player-centered phase board.
+- `src/presentation/components/GameControlPanel.tsx` hosts summary, detail, controls, and forecast UI.
 - `src/presentation/components/SeasonStatusPanel.tsx` exposes current campaign status.
 
 ## Session Pipeline
 
-1. Player selects a strategy posture in Presentation.
-2. Application store dispatches `playNextSession`.
-3. Domain resolves vectors, objectives, conflicts, intel, and relationships.
-4. Infrastructure persists updated `GameState`.
-5. Presentation re-renders from new immutable state snapshot.
+1. Player selects a faction on the phase board and sets a five-vector intent in Presentation.
+2. Application store updates forecast and selected faction state.
+3. Application store dispatches `playNextSession` using derived strategy plus player intent.
+4. Domain resolves vectors, objectives, conflicts, intel, and relationships.
+5. Infrastructure persists updated `GameState`.
+6. Presentation re-renders from new immutable state snapshot.
 
 ## Persistence Strategy
 

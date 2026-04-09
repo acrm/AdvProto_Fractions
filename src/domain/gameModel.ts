@@ -111,6 +111,18 @@ export interface GameState {
 
 export type PlayerStrategy = 'progress' | 'balanced' | 'sabotage'
 
+export interface PlayerIntent {
+  adjustments: ActivityVectorState
+}
+
+export interface TurnForecast {
+  derivedStrategy: PlayerStrategy
+  projectedVectors: ActivityVectorState
+  resourceDelta: number
+  exposureDelta: number
+  scorePressure: number
+}
+
 export interface SessionOutcome {
   summary: string
   progressedObjectives: number

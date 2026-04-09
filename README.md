@@ -45,8 +45,10 @@ Clean/DDD layers:
 - 4 active factions in MVP baseline.
 - 3 to 5 objectives generated per faction each season.
 - Objective conflict classes: compatible, contested, mutually-exclusive.
-- Five activity vectors rendered in a phase-space chart.
-- Session-level player strategy posture: progress, balanced, sabotage.
+- Full single-screen tactical interface.
+- Player-centered interactive phase board with zoom, pan, and faction selection.
+- Resource-scaled faction dots with trajectory tails.
+- Direct player control through five-vector movement intent and deterministic forecast.
 
 ## PWA
 
