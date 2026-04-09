@@ -19,6 +19,7 @@ interface GameStoreState {
   startCampaign: (seed?: number) => void
   selectFaction: (factionId: string) => void
   setIntentValue: (vector: ActivityVectorName, value: number) => void
+  setIntentTarget: (vector: ActivityVectorName, factionId: string) => void
   resetIntent: () => void
   playNextSession: () => void
   resetCampaign: () => void
@@ -60,13 +61,28 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   selectFaction: (factionId) => set({ selectedFactionId: factionId }),
   setIntentValue: (vector, value) => {
     const currentIntent = get().playerIntent
-    const nextIntent = {
+    const nextIntent: PlayerIntent = {
+      ...currentIntent,
       adjustments: {
         ...currentIntent.adjustments,
         [vector]: value,
       },
     }
 
+    set({
+      playerIntent: nextIntent,
+      forecast: forecastPlayerTurn(get().gameState, nextIntent),
+    })
+  },
+  setIntentTarget: (vector, factionId) => {
+    const currentIntent = get().playerIntent
+    const nextTargets = { ...currentIntent.targets }
+    if (factionId) {
+      nextTargets[vector] = factionId
+    } else {
+      delete nextTargets[vector]
+    }
+    const nextIntent: PlayerIntent = { ...currentIntent, targets: nextTargets }
     set({
       playerIntent: nextIntent,
       forecast: forecastPlayerTurn(get().gameState, nextIntent),

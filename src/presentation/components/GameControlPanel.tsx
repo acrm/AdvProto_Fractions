@@ -8,6 +8,7 @@ interface GameControlPanelProps {
   forecast: TurnForecast
   lastOutcome: SessionOutcome | null
   onSetIntentValue: (vector: ActivityVectorName, value: number) => void
+  onSetIntentTarget: (vector: ActivityVectorName, factionId: string) => void
   onResetIntent: () => void
   onRunSession: () => void
   onNewCampaign: () => void
@@ -34,6 +35,7 @@ export function GameControlPanel({
   forecast,
   lastOutcome,
   onSetIntentValue,
+  onSetIntentTarget,
   onResetIntent,
   onRunSession,
   onNewCampaign,
@@ -42,6 +44,7 @@ export function GameControlPanel({
   const selectedObjectives = gameState.seasonState.objectives.filter((objective) => objective.factionId === selectedFaction.id)
   const recentIntel = gameState.seasonState.intel.slice(-4)
   const recentLogs = gameState.seasonState.logs.slice(-4)
+  const nonPlayerFactions = gameState.factions.filter((faction) => !faction.isPlayer)
 
   return (
     <aside className="game-side-panel">
@@ -86,21 +89,37 @@ export function GameControlPanel({
         <div className="intent-list">
           {ACTIVITY_VECTORS.map((vector) => {
             const current = playerIntent.adjustments[vector]
-            const projected = forecast.projectedVectors[vector]
+            const normed = forecast.normalizedAdjustments[vector]
+            const effective = normed !== current ? normed.toFixed(1) : String(normed)
+            const currentTarget = playerIntent.targets[vector] ?? ''
             return (
-              <label className="intent-row" key={vector}>
-                <span>{VECTOR_LABELS[vector]}</span>
-                <input
-                  type="range"
-                  min={-18}
-                  max={18}
-                  step={1}
-                  value={current}
-                  onChange={(event) => onSetIntentValue(vector, Number(event.target.value))}
-                />
-                <span className="intent-value">{formatSigned(current)}</span>
-                <span className="intent-projection">→ {projected}</span>
-              </label>
+              <div className="intent-row" key={vector}>
+                <div className="intent-row-top">
+                  <span className="intent-label">{VECTOR_LABELS[vector]}</span>
+                  <span className="intent-value">{formatSigned(current)}</span>
+                  <span className="intent-projection">→ {effective}</span>
+                </div>
+                <div className="intent-row-bottom">
+                  <select
+                    className="intent-target-select"
+                    value={currentTarget}
+                    onChange={(event) => onSetIntentTarget(vector, event.target.value)}
+                  >
+                    <option value="">— no target —</option>
+                    {nonPlayerFactions.map((faction) => (
+                      <option key={faction.id} value={faction.id}>{faction.name}</option>
+                    ))}
+                  </select>
+                  <input
+                    type="range"
+                    min={-18}
+                    max={18}
+                    step={1}
+                    value={current}
+                    onChange={(event) => onSetIntentValue(vector, Number(event.target.value))}
+                  />
+                </div>
+              </div>
             )
           })}
         </div>

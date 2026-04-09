@@ -12,6 +12,7 @@ export function HomePage() {
     lastOutcome,
     selectFaction,
     setIntentValue,
+    setIntentTarget,
     resetIntent,
     playNextSession,
     startCampaign,
@@ -43,6 +44,7 @@ export function HomePage() {
         forecast={forecast}
         lastOutcome={lastOutcome}
         onSetIntentValue={setIntentValue}
+        onSetIntentTarget={setIntentTarget}
         onResetIntent={resetIntent}
         onRunSession={playNextSession}
         onNewCampaign={() => startCampaign(Date.now())}

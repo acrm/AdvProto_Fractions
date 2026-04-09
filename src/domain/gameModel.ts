@@ -131,11 +131,13 @@ export type PlayerStrategy = 'progress' | 'balanced' | 'sabotage'
 
 export interface PlayerIntent {
   adjustments: ActivityVectorState
+  targets: Partial<Record<ActivityVectorName, string>>
 }
 
 export interface TurnForecast {
   derivedStrategy: PlayerStrategy
   projectedVectors: ActivityVectorState
+  normalizedAdjustments: ActivityVectorState
   resourceDelta: number
   exposureDelta: number
   scorePressure: number

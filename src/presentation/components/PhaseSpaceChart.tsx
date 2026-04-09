@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import type { PointerEvent as ReactPointerEvent, WheelEvent as ReactWheelEvent } from 'react'
 import { ActivityVectorState, Faction } from '../../domain/gameModel'
 
+const DRAG_THRESHOLD_PX = 4
+
 interface PhaseSpaceChartProps {
   factions: Faction[]
   selectedFactionId: string
@@ -83,6 +85,8 @@ function trajectoryPoints(
 
 export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }: PhaseSpaceChartProps) {
   const canvasRef = useRef<HTMLDivElement | null>(null)
+  const dragMovedRef = useRef(false)
+  const dragStartRef = useRef({ x: 0, y: 0 })
   const [zoom, setZoom] = useState(1)
   const [pan, setPan] = useState({ x: 0, y: 0 })
   const [dragState, setDragState] = useState({ active: false, x: 0, y: 0, originX: 0, originY: 0 })
@@ -145,6 +149,8 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
 
   const handlePointerDown = (event: ReactPointerEvent<SVGSVGElement>) => {
     event.currentTarget.setPointerCapture(event.pointerId)
+    dragMovedRef.current = false
+    dragStartRef.current = { x: event.clientX, y: event.clientY }
     setDragState({
       active: true,
       x: event.clientX,
@@ -156,12 +162,17 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
 
   const handlePointerMove = (event: ReactPointerEvent<SVGSVGElement>) => {
     if (!dragState.active) return
+    const dx = event.clientX - dragStartRef.current.x
+    const dy = event.clientY - dragStartRef.current.y
+    if (!dragMovedRef.current && Math.sqrt(dx * dx + dy * dy) > DRAG_THRESHOLD_PX) {
+      dragMovedRef.current = true
+    }
     const rect = event.currentTarget.getBoundingClientRect()
-    const dx = ((event.clientX - dragState.x) / rect.width) * viewWidth
-    const dy = ((event.clientY - dragState.y) / rect.height) * viewHeight
+    const panDx = ((event.clientX - dragState.x) / rect.width) * viewWidth
+    const panDy = ((event.clientY - dragState.y) / rect.height) * viewHeight
     setPan({
-      x: dragState.originX + dx,
-      y: dragState.originY + dy,
+      x: dragState.originX + panDx,
+      y: dragState.originY + panDy,
     })
   }
 
@@ -181,6 +192,7 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
           viewBox={`0 0 ${viewWidth} ${viewHeight}`}
           role="img"
           aria-label="Faction activity phase space chart centered on player position"
+          style={{ userSelect: 'none' }}
           onWheel={handleWheel}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
@@ -218,9 +230,9 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
           -Covert / -Deterrence
         </text>
 
-        <circle cx={centerX} cy={centerY} r={10} fill="#030712" stroke={selectedFactionId === playerFaction.id ? '#f8fafc' : '#60a5fa'} strokeWidth={2.5} />
-        <circle cx={centerX} cy={centerY} r={18} fill="none" stroke={selectedFactionId === playerFaction.id ? '#f59e0b' : '#22d3ee'} strokeWidth={3.2} strokeOpacity={0.95} />
-        <text x={centerX + 28} y={centerY - 22} fontSize={15} fill="#f8fafc">Player faction</text>
+        <circle cx={centerX} cy={centerY} r={10 / zoom} fill="#030712" stroke={selectedFactionId === playerFaction.id ? '#f8fafc' : '#60a5fa'} strokeWidth={2.5 / zoom} />
+        <circle cx={centerX} cy={centerY} r={18 / zoom} fill="none" stroke={selectedFactionId === playerFaction.id ? '#f59e0b' : '#22d3ee'} strokeWidth={3.2 / zoom} strokeOpacity={0.95} />
+        <text x={centerX + 28 / zoom} y={centerY - 22 / zoom} fontSize={15 / zoom} fill="#f8fafc">Player</text>
 
         {factions.map((faction, index) => (
           <g key={faction.id}>
@@ -230,6 +242,8 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
               const highlight = selectedFactionId === faction.id
               const currentPoint = points[points.length - 1]
               const radius = pointRadius(faction.resourceStock, maxResource)
+              const rScaled = radius / zoom
+              const rTrail = Math.max(2, radius * 0.48) / zoom
 
               return (
                 <>
@@ -237,27 +251,27 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
                     points={points.map((point) => `${point.x},${point.y}`).join(' ')}
                     fill="none"
                     stroke={COLORS[index % COLORS.length]}
-                    strokeWidth={highlight ? 5 : 3}
+                    strokeWidth={(highlight ? 5 : 3) / zoom}
                     strokeOpacity={highlight ? 0.95 : 0.5}
                   />
                   <polyline
                     points={points.map((point) => `${point.x},${point.y}`).join(' ')}
                     fill="none"
                     stroke="transparent"
-                    strokeWidth={20}
-                    onClick={() => onSelectFaction(faction.id)}
+                    strokeWidth={28 / zoom}
+                    onClick={() => { if (!dragMovedRef.current) onSelectFaction(faction.id) }}
                   />
                   {points.map((point, pointIndex) => (
                     <circle
                       key={`${faction.id}-trail-${pointIndex}`}
                       cx={point.x}
                       cy={point.y}
-                      r={pointIndex === points.length - 1 ? radius : Math.max(3, radius * 0.48)}
+                      r={pointIndex === points.length - 1 ? rScaled : rTrail}
                       fill={COLORS[index % COLORS.length]}
                       fillOpacity={point.opacity}
                       stroke={highlight ? '#f8fafc' : '#dbeafe'}
-                      strokeWidth={pointIndex === points.length - 1 ? 2.3 : 1.2}
-                      onClick={() => onSelectFaction(faction.id)}
+                      strokeWidth={(pointIndex === points.length - 1 ? 2.3 : 1.2) / zoom}
+                      onClick={() => { if (!dragMovedRef.current) onSelectFaction(faction.id) }}
                     />
                   ))}
                   {highlight ? (
@@ -265,12 +279,12 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
                       <circle
                         cx={currentPoint.x}
                         cy={currentPoint.y}
-                        r={radius + 7}
+                        r={rScaled + 7 / zoom}
                         fill="none"
                         stroke="#f59e0b"
-                        strokeWidth={2.4}
+                        strokeWidth={2.4 / zoom}
                       />
-                      <text x={currentPoint.x + radius + 12} y={currentPoint.y - radius - 8} fontSize={15} fill="#f8fafc">
+                      <text x={currentPoint.x + rScaled + 12 / zoom} y={currentPoint.y - rScaled - 8 / zoom} fontSize={14 / zoom} fill="#f8fafc">
                         {faction.name}
                       </text>
                     </>
