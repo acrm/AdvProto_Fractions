@@ -28,6 +28,12 @@ All factions are represented in a phase-space with vectors in range -100 to 100:
 4. covertTempo
 5. deterrencePosture
 
+## Phase-Space Visualization Rules
+- The chart is player-centered: player position is the origin.
+- Every non-player faction is rendered as one current dot.
+- Every non-player faction also renders a trajectory tail for the last 5 sessions.
+- Projection uses a fixed linear mapping from 5D vectors into 2D to keep interpretation stable.
+
 ## Anti-Exploit Rules
 - Repeated sabotage raises exposure and retaliation risk.
 - Passive play causes strategic opportunity loss.

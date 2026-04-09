@@ -47,9 +47,11 @@ export function HomePage() {
 
       <SeasonStatusPanel gameState={gameState} />
 
-      <section className="panel-grid">
-        <PhaseSpaceChart factions={gameState.factions} />
+      <section className="phase-primary">
+        <PhaseSpaceChart factions={gameState.factions} isPrimary />
+      </section>
 
+      <section className="panel-grid-secondary">
         <article className="panel-card">
           <h3>Player Objectives</h3>
           <ul>
