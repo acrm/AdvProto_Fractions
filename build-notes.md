@@ -7,3 +7,4 @@
 - 2026w10-0.5 — feat: tactical game screen and vector control panel
 - 2026w10-0.6 — fix: lock tactical screen to single viewport
 - 2026w10-0.7 — fix: separate initial faction positions in phase board
+- 2026w10-0.8 — docs: focus doctrine advisory and player pivots

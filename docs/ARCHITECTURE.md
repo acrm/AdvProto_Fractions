@@ -20,9 +20,12 @@ infrastructure ← application (via interfaces)
 
 ## State Ownership
 
-- State is owned by the Application layer via Zustand stores.
+- Core simulation state is owned by the Application layer via Zustand stores.
+- Doctrine recommendation state is generated in Domain and exposed via Application selectors.
+- Player override intent state is owned by Application and persisted with campaign state.
 - Persistence is handled by Infrastructure (localStorage adapters).
 - Presentation reads state via hooks; never writes directly to storage.
+- Divergence telemetry (doctrine vs override) is computed in Application selectors and exported by telemetry adapters.
 
 ## Current System Modules
 
@@ -46,11 +49,12 @@ infrastructure ← application (via interfaces)
 ## Session Pipeline
 
 1. Player selects a faction on the phase board and sets a five-vector intent in Presentation.
-2. Application store updates forecast and selected faction state.
-3. Application store dispatches `playNextSession` using derived strategy plus player intent.
-4. Domain resolves vectors, objectives, conflicts, intel, and relationships.
-5. Infrastructure persists updated `GameState`.
-6. Presentation re-renders from new immutable state snapshot.
+2. Application store reads current doctrine recommendation and updates forecast alongside selected faction state.
+3. Application compares doctrine vector and player override intent, then computes divergence indicators.
+4. Application store dispatches `playNextSession` using derived strategy plus player intent.
+5. Domain resolves vectors, objectives, conflicts, intel, relationships, and next doctrine recommendation.
+6. Infrastructure persists updated `GameState`.
+7. Presentation re-renders from new immutable state snapshot.
 
 ## Persistence Strategy
 

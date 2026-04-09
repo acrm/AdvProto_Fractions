@@ -51,6 +51,9 @@ Clean/DDD layers:
 - Non-player factions start with distinct initial phase offsets around the player origin.
 - Resource-scaled faction dots with trajectory tails.
 - Direct player control through five-vector movement intent and deterministic forecast.
+- Seasonal doctrine concept documented as an advisory recommendation layer.
+- Explicit player override authority for doctrine divergence and tactical pivots.
+- Intel and deception signals designed to justify mid-season recommendation changes.
 
 ## PWA
 

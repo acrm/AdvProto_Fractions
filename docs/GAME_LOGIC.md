@@ -11,15 +11,35 @@ Phase Dominion is a seasonal multi-faction strategy game.
 ## Session Resolution Rules
 - Every faction pursues 3 to 5 seasonal objectives.
 - Objective classes define interactions: compatible, contested, mutually-exclusive.
+- The simulation derives a seasonal doctrine recommendation for the player faction.
 - The player sets a direct movement intent across all 5 activity vectors each session.
 - A derived stance (`progress`, `balanced`, `sabotage`) is inferred from that movement intent.
+- The player may follow or override doctrine at any session without losing turn validity.
 - Session results update score, resources, exposure, vectors, and relationships.
+
+## Player Decision Model: Doctrine vs Intent
+Each session resolves four decision inputs:
+1. Doctrine recommendation: system-generated five-vector direction for the current season.
+2. Intel delta: newly discovered information that can reinforce or contradict doctrine.
+3. Playstyle profile: player preference (for example opportunist, mediator, saboteur, stabilizer).
+4. Final intent: direct player-set vector values used for simulation.
+
+Resolution implications:
+- Following doctrine favors stable efficiency and forecast reliability.
+- Diverging from doctrine increases friction as opportunity cost, not as binary punishment.
+- High-confidence contradictory intel reduces pivot friction and should encourage adaptation.
+
+Forecast requirements:
+- Show expected outcome for doctrine-following path.
+- Show expected outcome for current override path.
+- Show divergence magnitude and projected consequence deltas.
 
 ## Information Rules
 - Players start with partial information.
 - Intel items are discovered through session progress.
 - Each intel item stores confidence and reliability.
 - Deceptive intel is possible and explicitly modeled.
+- Contradictory high-confidence intel should trigger a doctrine review prompt.
 
 ## Five Activity Vectors
 All factions are represented in a phase-space with vectors in range -100 to 100:
@@ -48,6 +68,8 @@ All factions are represented in a phase-space with vectors in range -100 to 100:
 - Repeated sabotage raises exposure and retaliation risk.
 - Passive play causes strategic opportunity loss.
 - Leader factions face coalition pressure and diminishing advantage.
+
+These rules are friction constraints, not mandatory strategic rails. They shape cost landscapes while preserving player agency and roleplay viability.
 
 ## MVP Scope
 - 4 factions.

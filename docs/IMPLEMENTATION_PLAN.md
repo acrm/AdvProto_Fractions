@@ -6,6 +6,7 @@ Deliver a playable MVP of Phase Dominion in the current codebase with clean boun
 ## Principles
 - Follow Clean/DDD: presentation -> application -> domain.
 - Keep simulation deterministic using a seed-based random source.
+- Treat seasonal doctrine as advisory and preserve explicit player override authority.
 - Keep all game documents in sync with implementation.
 
 ## Workstreams
@@ -16,6 +17,7 @@ Status: in progress
 - [x] Add seasonal/session loop rules.
 - [x] Implement objective generation and conflict classes.
 - [x] Implement relationship and intel baseline.
+- [ ] Add seasonal doctrine generation from objectives, relationships, and trajectories.
 - [ ] Add anti-exploit formulas as explicit tunable parameters.
 - [ ] Add domain unit tests for transitions and invariants.
 
@@ -24,6 +26,8 @@ Status: in progress
 - [x] Add Zustand game store.
 - [x] Add actions for strategy selection and session advance.
 - [x] Wire persistence for game state snapshots.
+- [ ] Add doctrine vs override divergence selectors.
+- [ ] Add doctrine re-evaluation triggers from high-confidence contradictory intel.
 - [ ] Add game commands for explicit progress and sabotage targeting.
 - [ ] Add selectors for telemetry extraction.
 
@@ -33,6 +37,8 @@ Status: in progress
 - [x] Add strategy controls and session run action.
 - [x] Add phase-space chart with five axes.
 - [x] Add status, objective, intel, and log panels.
+- [ ] Add seasonal doctrine recommendation panel with override comparison.
+- [ ] Add divergence indicators (magnitude and projected cost deltas).
 - [ ] Add objective planning UI with target selection.
 - [ ] Add relationship graph overlay and conflict inspection view.
 
@@ -46,6 +52,9 @@ Status: not started
 Status: not started
 - [ ] Emit session-level telemetry events.
 - [ ] Compute KPI aggregates for strategy depth and diversity.
+- [ ] Track doctrine adherence ratio and divergence magnitude by season.
+- [ ] Track intel-driven pivot frequency and pivot quality outcomes.
+- [ ] Track playstyle viability parity across doctrine-heavy and doctrine-light runs.
 - [ ] Add seed-batch simulation script for balance checks.
 
 ## Milestone Plan
@@ -77,10 +86,12 @@ Status: not started
 - `npm run build` passes.
 - Deterministic replay: same seed yields same outcomes.
 
-### Gate 2: Design
+### Gate 2: Design and Agency
 - Player has at least 3 meaningful choices each session.
+- Doctrine recommendation is visible and comparable against player override.
+- Doctrine divergence appears in at least 30% of playtest sessions without automatic failure bias.
+- Intel-driven replans are available and visibly justified by confidence/reliability data.
 - Compatible/contested/mutually-exclusive conflicts are visible in UI.
-- Progress vs sabotage tradeoff is measurable from logs.
 
 ### Gate 3: Playtest
 - Players understand phase-space interpretation after onboarding.
@@ -88,12 +99,12 @@ Status: not started
 
 ## Immediate Backlog (next 10 working days)
 1. Add formal objective targeting in player actions.
-2. Expose conflict resolution math in a detail panel.
-3. Add relationship edge visualization component.
-4. Add deterministic replay debug panel.
-5. Add telemetry event adapter and local JSON exporter.
-6. Introduce AI utility weights as config.
-7. Add domain tests for objective resolver.
-8. Add domain tests for relationship transitions.
-9. Add season-end score summary screen.
+2. Implement seasonal doctrine generation and recommendation output.
+3. Add intel-driven doctrine replan triggers and explanation hooks.
+4. Expose conflict resolution math in a detail panel.
+5. Add relationship edge visualization component.
+6. Add deterministic replay debug panel.
+7. Add telemetry event adapter and local JSON exporter.
+8. Add domain tests for objective resolver.
+9. Add domain tests for relationship transitions.
 10. Run first balance batch across 200 seeds.

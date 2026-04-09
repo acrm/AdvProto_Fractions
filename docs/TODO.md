@@ -7,6 +7,9 @@
 - [x] Seasonal/session simulation baseline
 - [x] Application game store and persistence
 - [x] Base phase-space shell UI
+- [ ] Seasonal doctrine recommendation generation
+- [ ] Doctrine vs override divergence tracking
+- [ ] Intel-confidence-driven pivot prompts
 - [ ] Objective targeting interactions for player actions
 - [ ] Relationship graph panel
 - [ ] Deterministic replay inspector
@@ -16,6 +19,8 @@
 - [ ] Utility AI with configurable behavior weights
 - [ ] Expanded conflict explanation panel
 - [ ] Mid-season disruption events
+- [ ] Playstyle profile integration in recommendation layer
+- [ ] Doctrine adherence and pivot quality KPI dashboards
 - [ ] KPI telemetry export and local dashboard
 - [ ] Balance tuning across seed batches
 
