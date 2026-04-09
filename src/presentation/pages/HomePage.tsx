@@ -28,17 +28,6 @@ export function HomePage() {
   return (
     <main className="game-screen">
       <section className="game-board-column">
-        <div className="board-topline">
-          <div>
-            <p className="eyebrow">Phase Dominion</p>
-            <h1>Operational Screen</h1>
-          </div>
-          <div className="board-topline-meta">
-            <span>{gameState.config.factionCount} factions</span>
-            <span>{gameState.completed ? 'campaign complete' : 'campaign active'}</span>
-          </div>
-        </div>
-
         <PhaseSpaceChart
           factions={gameState.factions}
           selectedFactionId={selectedFaction.id}

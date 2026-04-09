@@ -124,29 +124,19 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
 
   return (
     <div className="phase-board">
-      <div className="phase-board-head">
-        <div>
-          <p className="eyebrow">Strategic Space</p>
-          <h2>Faction Phase Board</h2>
-        </div>
-        <div className="phase-board-meta">
-          <span>Wheel to zoom</span>
-          <span>Drag to pan</span>
-          <span>Click point or trail to select</span>
-        </div>
-      </div>
-      <svg
-        width="100%"
-        height="auto"
-        viewBox={`0 0 ${VIEWBOX_SIZE} ${VIEWBOX_SIZE}`}
-        role="img"
-        aria-label="Faction activity phase space chart centered on player position"
-        onWheel={handleWheel}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onPointerLeave={handlePointerUp}
-      >
+      <div className="phase-canvas">
+        <svg
+          width="100%"
+          height="auto"
+          viewBox={`0 0 ${VIEWBOX_SIZE} ${VIEWBOX_SIZE}`}
+          role="img"
+          aria-label="Faction activity phase space chart centered on player position"
+          onWheel={handleWheel}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerLeave={handlePointerUp}
+        >
         <rect x={0} y={0} width={VIEWBOX_SIZE} height={VIEWBOX_SIZE} fill="#030712" rx={28} />
         <g transform={`translate(${pan.x}, ${pan.y}) scale(${zoom})`}>
         {[0.25, 0.5, 0.75, 1].map((ratio) => (
@@ -240,7 +230,8 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
           </g>
         ))}
         </g>
-      </svg>
+        </svg>
+      </div>
       <ul className="legend-list">
         {factions.map((faction, index) => (
           <li key={faction.id} className={selectedFactionId === faction.id ? 'legend-active' : ''}>

@@ -46,6 +46,7 @@ Clean/DDD layers:
 - 3 to 5 objectives generated per faction each season.
 - Objective conflict classes: compatible, contested, mutually-exclusive.
 - Full single-screen tactical interface.
+- Diagram plus side panel are constrained to the full viewport without page scrolling.
 - Player-centered interactive phase board with zoom, pan, and faction selection.
 - Resource-scaled faction dots with trajectory tails.
 - Direct player control through five-vector movement intent and deterministic forecast.

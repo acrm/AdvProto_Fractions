@@ -1,41 +1,22 @@
 #root {
   width: 100%;
-  min-height: 100vh;
+  height: 100dvh;
 }
 
 .game-screen {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 380px;
   gap: 1rem;
-  min-height: 100vh;
+  height: 100dvh;
   padding: 1rem;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 .game-board-column {
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  gap: 0.75rem;
   min-height: 0;
-}
-
-.board-topline {
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  padding: 0.25rem 0.25rem 0 0.25rem;
-}
-
-.board-topline h1 {
-  margin: 0;
-  color: #eff6ff;
-}
-
-.board-topline-meta {
-  display: flex;
-  gap: 0.75rem;
-  color: #8da2bd;
-  font-size: 0.9rem;
+  min-height: 0;
 }
 
 .eyebrow {
@@ -62,37 +43,29 @@
 
 .phase-board {
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-rows: minmax(0, 1fr) auto;
   min-height: 0;
-  padding: 1rem;
+  padding: 0.85rem;
+  overflow: hidden;
 }
 
-.phase-board-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: end;
-  gap: 1rem;
-  color: #f8fafc;
-}
-
-.phase-board-head h2,
 .game-side-panel h2,
 .game-side-panel h3 {
   margin: 0;
   color: #f8fafc;
 }
 
-.phase-board-meta {
-  display: flex;
-  gap: 0.85rem;
-  flex-wrap: wrap;
-  color: #93a6bf;
-  font-size: 0.9rem;
+.phase-canvas {
+  display: grid;
+  place-items: center;
+  min-height: 0;
 }
 
 .phase-board svg {
   display: block;
-  width: 100%;
+  width: min(100%, calc(100dvh - 9.5rem));
+  max-width: 100%;
+  max-height: calc(100dvh - 8.5rem);
   aspect-ratio: 1 / 1;
   touch-action: none;
 }
@@ -135,6 +108,7 @@
   gap: 0.85rem;
   padding: 1rem;
   overflow: auto;
+  min-height: 0;
 }
 
 .panel-section {
@@ -250,10 +224,11 @@ button:disabled {
 @media (max-width: 1180px) {
   .game-screen {
     grid-template-columns: 1fr;
+    height: 100dvh;
   }
 
   .game-side-panel {
-    max-height: none;
+    min-height: 0;
   }
 
   .control-actions {
@@ -262,5 +237,10 @@ button:disabled {
 
   .intent-row {
     grid-template-columns: 1fr;
+  }
+
+  .phase-board svg {
+    width: min(100%, calc(100dvh - 22rem));
+    max-height: calc(100dvh - 22rem);
   }
 }
