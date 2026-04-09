@@ -47,7 +47,8 @@ Clean/DDD layers:
 - Objective conflict classes: compatible, contested, mutually-exclusive.
 - Full single-screen tactical interface.
 - Diagram plus side panel are constrained to the full viewport without page scrolling.
-- Player-centered interactive phase board with zoom, pan, and faction selection.
+- Player-centered interactive phase board with cursor-centered zoom, pan, and faction selection.
+- Non-player factions start with distinct initial phase offsets around the player origin.
 - Resource-scaled faction dots with trajectory tails.
 - Direct player control through five-vector movement intent and deterministic forecast.
 

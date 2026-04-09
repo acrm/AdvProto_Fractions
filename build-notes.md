@@ -6,3 +6,4 @@
 - 2026w10-0.4 — feat: player-centered phase space with trajectories
 - 2026w10-0.5 — feat: tactical game screen and vector control panel
 - 2026w10-0.6 — fix: lock tactical screen to single viewport
+- 2026w10-0.7 — fix: separate initial faction positions in phase board

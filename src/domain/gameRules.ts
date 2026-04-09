@@ -43,6 +43,50 @@ const REL_VISIBLE: RelationshipState[] = [
 ]
 const REL_HIDDEN: HiddenRelationState[] = ['none', 'hidden-sympathy', 'hidden-resentment', 'secret-pact', 'covert-conflict']
 const COMPATIBILITY_CLASSES: CompatibilityClass[] = ['compatible', 'contested', 'mutually-exclusive']
+const INITIAL_VECTOR_OFFSETS: ActivityVectorState[] = [
+  {
+    territorialPressure: 18,
+    diplomaticMomentum: 12,
+    economicThroughput: 16,
+    covertTempo: -8,
+    deterrencePosture: -10,
+  },
+  {
+    territorialPressure: -14,
+    diplomaticMomentum: 20,
+    economicThroughput: 10,
+    covertTempo: 14,
+    deterrencePosture: -6,
+  },
+  {
+    territorialPressure: 10,
+    diplomaticMomentum: -16,
+    economicThroughput: -12,
+    covertTempo: 18,
+    deterrencePosture: 14,
+  },
+  {
+    territorialPressure: -20,
+    diplomaticMomentum: -10,
+    economicThroughput: 14,
+    covertTempo: -16,
+    deterrencePosture: 18,
+  },
+  {
+    territorialPressure: 16,
+    diplomaticMomentum: -18,
+    economicThroughput: 18,
+    covertTempo: 8,
+    deterrencePosture: -14,
+  },
+  {
+    territorialPressure: -18,
+    diplomaticMomentum: 8,
+    economicThroughput: -16,
+    covertTempo: -12,
+    deterrencePosture: 16,
+  },
+]
 
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value))
@@ -123,9 +167,23 @@ function intentScorePressure(intent: PlayerIntent): number {
   )
 }
 
+function initialFactionVectors(index: number, isPlayer: boolean): ActivityVectorState {
+  if (isPlayer) return createZeroVectorState()
+
+  const offset = INITIAL_VECTOR_OFFSETS[index % INITIAL_VECTOR_OFFSETS.length]
+  return {
+    territorialPressure: offset.territorialPressure,
+    diplomaticMomentum: offset.diplomaticMomentum,
+    economicThroughput: offset.economicThroughput,
+    covertTempo: offset.covertTempo,
+    deterrencePosture: offset.deterrencePosture,
+  }
+}
+
 function createFaction(index: number, factionCount: number): Faction {
   const name = FACTION_NAMES[index] ?? `Faction ${index + 1}`
   const isPlayer = index === factionCount - 1
+  const initialVectors = initialFactionVectors(index, isPlayer)
 
   return {
     id: `f${index + 1}`,
@@ -137,8 +195,8 @@ function createFaction(index: number, factionCount: number): Faction {
     resourceStock: isPlayer ? 72 : 84,
     exposure: isPlayer ? 12 : 6,
     score: 0,
-    vectors: createZeroVectorState(),
-    trajectory: [createZeroVectorState()],
+    vectors: initialVectors,
+    trajectory: [initialVectors],
   }
 }
 

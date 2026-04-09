@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { PointerEvent as ReactPointerEvent, WheelEvent as ReactWheelEvent } from 'react'
 import { ActivityVectorState, Faction } from '../../domain/gameModel'
 
@@ -10,9 +10,8 @@ interface PhaseSpaceChartProps {
 
 const COLORS = ['#005f73', '#ee9b00', '#9b2226', '#3a86ff', '#2a9d8f', '#6a4c93', '#ef476f']
 const TRAJECTORY_TAIL = 5
-const VIEWBOX_SIZE = 1000
-const VIEWBOX_CENTER = VIEWBOX_SIZE / 2
-const BASE_RADIUS = 360
+const MIN_VIEWPORT_WIDTH = 720
+const MIN_VIEWPORT_HEIGHT = 540
 
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value))
@@ -22,7 +21,8 @@ function projectRelativePoint(
   vectors: ActivityVectorState,
   playerVectors: ActivityVectorState,
   radius: number,
-  center: number,
+  centerX: number,
+  centerY: number,
 ): { x: number; y: number } {
   const territorial = clamp(vectors.territorialPressure - playerVectors.territorialPressure, -200, 200)
   const diplomatic = clamp(vectors.diplomaticMomentum - playerVectors.diplomaticMomentum, -200, 200)
@@ -37,8 +37,8 @@ function projectRelativePoint(
   const yNorm = clamp(yRaw / 200, -1, 1)
 
   return {
-    x: center + xNorm * radius,
-    y: center - yNorm * radius,
+    x: centerX + xNorm * radius,
+    y: centerY - yNorm * radius,
   }
 }
 
@@ -52,7 +52,8 @@ function trajectoryPoints(
   faction: Faction,
   playerFaction: Faction,
   radius: number,
-  center: number,
+  centerX: number,
+  centerY: number,
 ): Array<{ x: number; y: number; opacity: number }> {
   const maxLength = Math.min(faction.trajectory.length, playerFaction.trajectory.length)
   if (maxLength === 0) return []
@@ -66,7 +67,8 @@ function trajectoryPoints(
       faction.trajectory[index],
       playerFaction.trajectory[index],
       radius,
-      center,
+      centerX,
+      centerY,
     )
 
     const order = index - start + 1
@@ -80,11 +82,37 @@ function trajectoryPoints(
 }
 
 export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }: PhaseSpaceChartProps) {
+  const canvasRef = useRef<HTMLDivElement | null>(null)
   const [zoom, setZoom] = useState(1)
   const [pan, setPan] = useState({ x: 0, y: 0 })
   const [dragState, setDragState] = useState({ active: false, x: 0, y: 0, originX: 0, originY: 0 })
+  const [viewport, setViewport] = useState({ width: 1000, height: 1000 })
   const playerFaction = factions.find((faction) => faction.isPlayer)
   const maxResource = Math.max(...factions.map((faction) => faction.resourceStock), 1)
+
+  useEffect(() => {
+    const element = canvasRef.current
+    if (!element) return
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      const entry = entries[0]
+      if (!entry) return
+
+      setViewport({
+        width: Math.max(MIN_VIEWPORT_WIDTH, Math.round(entry.contentRect.width)),
+        height: Math.max(MIN_VIEWPORT_HEIGHT, Math.round(entry.contentRect.height)),
+      })
+    })
+
+    resizeObserver.observe(element)
+    return () => resizeObserver.disconnect()
+  }, [])
+
+  const viewWidth = viewport.width
+  const viewHeight = viewport.height
+  const centerX = viewWidth / 2
+  const centerY = viewHeight / 2
+  const baseRadius = Math.min(viewWidth, viewHeight) * 0.34
 
   if (!playerFaction) {
     return (
@@ -97,10 +125,26 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
 
   const handleWheel = (event: ReactWheelEvent<SVGSVGElement>) => {
     event.preventDefault()
-    setZoom((current) => clamp(current + (event.deltaY > 0 ? -0.12 : 0.12), 0.65, 2.4))
+    const rect = event.currentTarget.getBoundingClientRect()
+    const pointerX = ((event.clientX - rect.left) / rect.width) * viewWidth
+    const pointerY = ((event.clientY - rect.top) / rect.height) * viewHeight
+
+    setZoom((currentZoom) => {
+      const nextZoom = clamp(currentZoom + (event.deltaY > 0 ? -0.12 : 0.12), 0.65, 2.4)
+      const worldX = (pointerX - pan.x) / currentZoom
+      const worldY = (pointerY - pan.y) / currentZoom
+
+      setPan({
+        x: pointerX - worldX * nextZoom,
+        y: pointerY - worldY * nextZoom,
+      })
+
+      return nextZoom
+    })
   }
 
   const handlePointerDown = (event: ReactPointerEvent<SVGSVGElement>) => {
+    event.currentTarget.setPointerCapture(event.pointerId)
     setDragState({
       active: true,
       x: event.clientX,
@@ -112,23 +156,29 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
 
   const handlePointerMove = (event: ReactPointerEvent<SVGSVGElement>) => {
     if (!dragState.active) return
+    const rect = event.currentTarget.getBoundingClientRect()
+    const dx = ((event.clientX - dragState.x) / rect.width) * viewWidth
+    const dy = ((event.clientY - dragState.y) / rect.height) * viewHeight
     setPan({
-      x: dragState.originX + (event.clientX - dragState.x),
-      y: dragState.originY + (event.clientY - dragState.y),
+      x: dragState.originX + dx,
+      y: dragState.originY + dy,
     })
   }
 
-  const handlePointerUp = () => {
+  const handlePointerUp = (event?: ReactPointerEvent<SVGSVGElement>) => {
+    if (event && event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId)
+    }
     setDragState((current) => ({ ...current, active: false }))
   }
 
   return (
     <div className="phase-board">
-      <div className="phase-canvas">
+      <div className="phase-canvas" ref={canvasRef}>
         <svg
           width="100%"
-          height="auto"
-          viewBox={`0 0 ${VIEWBOX_SIZE} ${VIEWBOX_SIZE}`}
+          height="100%"
+          viewBox={`0 0 ${viewWidth} ${viewHeight}`}
           role="img"
           aria-label="Faction activity phase space chart centered on player position"
           onWheel={handleWheel}
@@ -137,44 +187,45 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
           onPointerUp={handlePointerUp}
           onPointerLeave={handlePointerUp}
         >
-        <rect x={0} y={0} width={VIEWBOX_SIZE} height={VIEWBOX_SIZE} fill="#030712" rx={28} />
-        <g transform={`translate(${pan.x}, ${pan.y}) scale(${zoom})`}>
+        <rect x={0} y={0} width={viewWidth} height={viewHeight} fill="#030712" rx={28} />
+        <g transform={`translate(${pan.x}, ${pan.y})`}>
+        <g transform={`scale(${zoom})`}>
         {[0.25, 0.5, 0.75, 1].map((ratio) => (
           <circle
             key={ratio}
-            cx={VIEWBOX_CENTER}
-            cy={VIEWBOX_CENTER}
-            r={BASE_RADIUS * ratio}
+            cx={centerX}
+            cy={centerY}
+            r={baseRadius * ratio}
             fill="none"
             stroke="#183046"
             strokeWidth={1}
           />
         ))}
 
-        <line x1={VIEWBOX_CENTER - BASE_RADIUS} y1={VIEWBOX_CENTER} x2={VIEWBOX_CENTER + BASE_RADIUS} y2={VIEWBOX_CENTER} stroke="#26455f" strokeWidth={1.2} />
-        <line x1={VIEWBOX_CENTER} y1={VIEWBOX_CENTER - BASE_RADIUS} x2={VIEWBOX_CENTER} y2={VIEWBOX_CENTER + BASE_RADIUS} stroke="#26455f" strokeWidth={1.2} />
+        <line x1={centerX - baseRadius} y1={centerY} x2={centerX + baseRadius} y2={centerY} stroke="#26455f" strokeWidth={1.2} />
+        <line x1={centerX} y1={centerY - baseRadius} x2={centerX} y2={centerY + baseRadius} stroke="#26455f" strokeWidth={1.2} />
 
-        <text x={VIEWBOX_CENTER + BASE_RADIUS + 18} y={VIEWBOX_CENTER + 5} fontSize={15} fill="#d0d8e6">
+        <text x={centerX + baseRadius + 18} y={centerY + 5} fontSize={15} fill="#d0d8e6">
           +Economic / +Diplomatic
         </text>
-        <text x={VIEWBOX_CENTER - BASE_RADIUS - 18} y={VIEWBOX_CENTER + 5} textAnchor="end" fontSize={15} fill="#d0d8e6">
+        <text x={centerX - baseRadius - 18} y={centerY + 5} textAnchor="end" fontSize={15} fill="#d0d8e6">
           -Economic / -Diplomatic
         </text>
-        <text x={VIEWBOX_CENTER + 2} y={VIEWBOX_CENTER - BASE_RADIUS - 18} textAnchor="middle" fontSize={15} fill="#d0d8e6">
+        <text x={centerX + 2} y={centerY - baseRadius - 18} textAnchor="middle" fontSize={15} fill="#d0d8e6">
           +Covert / +Deterrence
         </text>
-        <text x={VIEWBOX_CENTER + 2} y={VIEWBOX_CENTER + BASE_RADIUS + 24} textAnchor="middle" fontSize={15} fill="#d0d8e6">
+        <text x={centerX + 2} y={centerY + baseRadius + 24} textAnchor="middle" fontSize={15} fill="#d0d8e6">
           -Covert / -Deterrence
         </text>
 
-        <circle cx={VIEWBOX_CENTER} cy={VIEWBOX_CENTER} r={10} fill="#030712" stroke={selectedFactionId === playerFaction.id ? '#f8fafc' : '#60a5fa'} strokeWidth={2.5} />
-        <circle cx={VIEWBOX_CENTER} cy={VIEWBOX_CENTER} r={18} fill="none" stroke={selectedFactionId === playerFaction.id ? '#f59e0b' : '#22d3ee'} strokeWidth={3.2} strokeOpacity={0.95} />
-        <text x={VIEWBOX_CENTER + 28} y={VIEWBOX_CENTER - 22} fontSize={15} fill="#f8fafc">Player faction</text>
+        <circle cx={centerX} cy={centerY} r={10} fill="#030712" stroke={selectedFactionId === playerFaction.id ? '#f8fafc' : '#60a5fa'} strokeWidth={2.5} />
+        <circle cx={centerX} cy={centerY} r={18} fill="none" stroke={selectedFactionId === playerFaction.id ? '#f59e0b' : '#22d3ee'} strokeWidth={3.2} strokeOpacity={0.95} />
+        <text x={centerX + 28} y={centerY - 22} fontSize={15} fill="#f8fafc">Player faction</text>
 
         {factions.map((faction, index) => (
           <g key={faction.id}>
             {!faction.isPlayer && (() => {
-              const points = trajectoryPoints(faction, playerFaction, BASE_RADIUS, VIEWBOX_CENTER)
+              const points = trajectoryPoints(faction, playerFaction, baseRadius, centerX, centerY)
               if (points.length === 0) return null
               const highlight = selectedFactionId === faction.id
               const currentPoint = points[points.length - 1]
@@ -229,6 +280,7 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
             })()}
           </g>
         ))}
+        </g>
         </g>
         </svg>
       </div>

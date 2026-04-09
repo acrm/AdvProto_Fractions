@@ -59,14 +59,15 @@
   display: grid;
   place-items: center;
   min-height: 0;
+  height: 100%;
 }
 
 .phase-board svg {
   display: block;
-  width: min(100%, calc(100dvh - 9.5rem));
-  max-width: 100%;
-  max-height: calc(100dvh - 8.5rem);
-  aspect-ratio: 1 / 1;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
   touch-action: none;
 }
 
@@ -240,7 +241,7 @@ button:disabled {
   }
 
   .phase-board svg {
-    width: min(100%, calc(100dvh - 22rem));
-    max-height: calc(100dvh - 22rem);
+    width: 100%;
+    height: 100%;
   }
 }
