@@ -1,21 +1,41 @@
 # Game Logic
 
-AdvProto Fractions is a fractions learning application.
+Phase Dominion is a seasonal multi-faction strategy game.
 
-## Core Concepts
+## Campaign Structure
+- 3 to 7 factions can be active at runtime.
+- The player controls the most agile, non-dominant faction.
+- A campaign runs through multiple seasons.
+- Each season runs 4 sessions in MVP.
 
-- A **Fraction** is a value object with numerator and denominator.
-- Denominator cannot be zero (enforced in domain layer).
-- Fractions can be added, compared, and simplified.
+## Session Resolution Rules
+- Every faction pursues 3 to 5 seasonal objectives.
+- Objective classes define interactions: compatible, contested, mutually-exclusive.
+- The player chooses a strategy posture each session: progress, balanced, sabotage.
+- Session results update score, resources, exposure, vectors, and relationships.
 
-## Features (MVP)
+## Information Rules
+- Players start with partial information.
+- Intel items are discovered through session progress.
+- Each intel item stores confidence and reliability.
+- Deceptive intel is possible and explicitly modeled.
 
-1. Display a list of fractions.
-2. Add random fractions.
-3. Reset the list.
+## Five Activity Vectors
+All factions are represented in a phase-space with vectors in range -100 to 100:
+1. territorialPressure
+2. diplomaticMomentum
+3. economicThroughput
+4. covertTempo
+5. deterrencePosture
 
-## Planned Features
+## Anti-Exploit Rules
+- Repeated sabotage raises exposure and retaliation risk.
+- Passive play causes strategic opportunity loss.
+- Leader factions face coalition pressure and diminishing advantage.
 
-- Fraction simplification (GCD).
-- Fraction arithmetic (add, subtract, multiply, divide).
-- Quiz mode: guess the result of fraction operations.
+## MVP Scope
+- 4 factions.
+- 6 campaign seasons.
+- 4 sessions per season.
+- Deterministic seed-based simulation.
+- Base phase-space visualization and session shell.

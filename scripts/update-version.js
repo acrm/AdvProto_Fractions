@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync, writeFileSync, appendFileSync } from 'fs'
 import { execSync } from 'child_process'
+import { fileURLToPath } from 'url'
 
 const args = process.argv.slice(2)
 const isMinor = args.includes('--minor')
@@ -9,9 +10,9 @@ const noCommit = args.includes('--no-commit')
 const descIdx = args.indexOf('--desc')
 const desc = descIdx !== -1 ? args[descIdx + 1] : 'version bump'
 
-const versionPath = new URL('../version.json', import.meta.url).pathname
-const pkgPath = new URL('../package.json', import.meta.url).pathname
-const buildNotesPath = new URL('../build-notes.md', import.meta.url).pathname
+const versionPath = fileURLToPath(new URL('../version.json', import.meta.url))
+const pkgPath = fileURLToPath(new URL('../package.json', import.meta.url))
+const buildNotesPath = fileURLToPath(new URL('../build-notes.md', import.meta.url))
 
 const version = JSON.parse(readFileSync(versionPath, 'utf8'))
 const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'))

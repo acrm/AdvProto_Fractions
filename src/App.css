@@ -1,6 +1,126 @@
 #root {
-  max-width: 1280px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  padding: 1.25rem;
+}
+
+.shell {
+  display: grid;
+  gap: 1rem;
+}
+
+.hero {
+  background: linear-gradient(135deg, #f8f2de 0%, #dbe9ff 100%);
+  border: 1px solid #c8d3e0;
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+}
+
+.hero h1 {
+  margin: 0;
+  color: #12263a;
+}
+
+.hero p {
+  margin: 0.4rem 0 0;
+  color: #2f3e46;
+}
+
+.controls-card,
+.status-card,
+.panel-card,
+.phase-card {
+  background: #ffffff;
+  border: 1px solid #d7dee3;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.controls-card {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.controls-card label {
+  font-weight: 600;
+}
+
+.controls-card select {
+  max-width: 240px;
+  padding: 0.4rem 0.5rem;
+}
+
+.controls-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+button {
+  background: #12344d;
+  color: #ffffff;
+  border: 0;
+  border-radius: 8px;
+  padding: 0.5rem 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.outcome-line {
+  margin: 0;
+  color: #34536b;
+}
+
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0.75rem;
+}
+
+.panel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.panel-card ul,
+.phase-card ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.panel-card li,
+.phase-card li {
+  margin-bottom: 0.25rem;
+}
+
+.phase-card {
+  display: grid;
+  justify-items: center;
+}
+
+.legend-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 0.4rem;
+  width: 100%;
+}
+
+.legend-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.legend-chip {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
 }

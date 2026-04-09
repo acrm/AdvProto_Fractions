@@ -24,8 +24,34 @@ infrastructure ← application (via interfaces)
 - Persistence is handled by Infrastructure (localStorage adapters).
 - Presentation reads state via hooks; never writes directly to storage.
 
+## Current System Modules
+
+### Domain
+- `src/domain/gameModel.ts` defines core entities and value ranges.
+- `src/domain/gameRules.ts` contains deterministic seasonal/session transition logic.
+
+### Application
+- `src/application/useGameStore.ts` orchestrates game commands and state lifecycle.
+
+### Infrastructure
+- `src/infrastructure/seededRandom.ts` provides deterministic pseudo-random generation.
+- `src/infrastructure/persistence.ts` persists `GameState` snapshots.
+
+### Presentation
+- `src/presentation/pages/HomePage.tsx` hosts the game shell.
+- `src/presentation/components/PhaseSpaceChart.tsx` renders five-axis faction states.
+- `src/presentation/components/SeasonStatusPanel.tsx` exposes current campaign status.
+
+## Session Pipeline
+
+1. Player selects a strategy posture in Presentation.
+2. Application store dispatches `playNextSession`.
+3. Domain resolves vectors, objectives, conflicts, intel, and relationships.
+4. Infrastructure persists updated `GameState`.
+5. Presentation re-renders from new immutable state snapshot.
+
 ## Persistence Strategy
 
 - `localStorage` for client-side persistence.
 - Adapters in `src/infrastructure/persistence.ts`.
-- Domain objects are serialized/deserialized through infrastructure only.
+- Full campaign state is stored under a dedicated game storage key.

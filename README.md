@@ -1,6 +1,6 @@
-# AdvProto Fractions
+# Phase Dominion Prototype
 
-A Progressive Web App for learning fractions. Built with React 19 + TypeScript + Vite.
+A seasonal multi-faction strategy prototype built with React 19 + TypeScript + Vite.
 
 ## Quick Start
 
@@ -13,6 +13,12 @@ npm run dev
 
 ```bash
 npm run build
+```
+
+## Type Check
+
+```bash
+npm run typecheck
 ```
 
 ## Deploy
@@ -32,6 +38,15 @@ Clean/DDD layers:
 - `application/` — use-cases and state (Zustand)
 - `infrastructure/` — localStorage adapters
 - `presentation/` — React components
+
+## Current Prototype Features
+
+- Seasonal loop with deterministic seeded simulation.
+- 4 active factions in MVP baseline.
+- 3 to 5 objectives generated per faction each season.
+- Objective conflict classes: compatible, contested, mutually-exclusive.
+- Five activity vectors rendered in a phase-space chart.
+- Session-level player strategy posture: progress, balanced, sabotage.
 
 ## PWA
 

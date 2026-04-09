@@ -1,17 +1,17 @@
-import { Fraction } from '../domain/Fraction'
+import { GameState } from '../domain/gameModel'
 
-const STORAGE_KEY = 'fractions'
+const STORAGE_KEY = 'seasonal-faction-game-state'
 
-export function saveFractions(fractions: Fraction[]): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(fractions))
+export function saveGameState(state: GameState): void {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
 }
 
-export function loadFractions(): Fraction[] {
+export function loadGameState(): GameState | null {
   const raw = localStorage.getItem(STORAGE_KEY)
-  if (!raw) return []
+  if (!raw) return null
   try {
-    return JSON.parse(raw) as Fraction[]
+    return JSON.parse(raw) as GameState
   } catch {
-    return []
+    return null
   }
 }
