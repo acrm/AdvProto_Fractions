@@ -7,7 +7,7 @@ export function FractionList({ fractions }: Props) {
   return (
     <ul>
       {fractions.map((f, i) => (
-        <li key={i}>{f}</li>
+        <li key={`${f}-${i}`}>{f}</li>
       ))}
     </ul>
   )

@@ -37,7 +37,7 @@ if (!noCommit) {
     if (isStagedOnly) {
       execSync(`git add version.json package.json build-notes.md`, { stdio: 'inherit' })
     } else {
-      execSync(`git add version.json package.json build-notes.md`, { stdio: 'inherit' })
+      execSync(`git add -A`, { stdio: 'inherit' })
     }
     execSync(`git commit -m "${version.currentVersion}: ${desc}"`, { stdio: 'inherit' })
   } catch (e) {
