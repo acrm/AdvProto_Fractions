@@ -43,6 +43,7 @@ export function HomePage() {
         playerIntent={playerIntent}
         forecast={forecast}
         lastOutcome={lastOutcome}
+        onSelectFaction={selectFaction}
         onSetIntentValue={setIntentValue}
         onSetIntentTarget={setIntentTarget}
         onResetIntent={resetIntent}

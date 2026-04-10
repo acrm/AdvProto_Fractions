@@ -31,6 +31,7 @@ interface VectorStarControlsProps {
   playerIntent: PlayerIntent
   forecast: TurnForecast
   factions: Faction[]
+  factionColors: Record<string, string>
   onSetIntentValue: (vector: ActivityVectorName, value: number) => void
   onSetIntentTarget: (vector: ActivityVectorName, factionId: string) => void
 }
@@ -43,6 +44,7 @@ export function VectorStarControls({
   playerIntent,
   forecast,
   factions,
+  factionColors,
   onSetIntentValue,
   onSetIntentTarget,
 }: VectorStarControlsProps) {
@@ -130,13 +132,16 @@ export function VectorStarControls({
                   {targetFaction ? (
                     <button
                       type="button"
-                      className="faction-token faction-token-assigned"
+                      className="faction-token faction-token-assigned faction-token-dot"
                       draggable
                       onDragStart={(event) => handleDragStart(event, targetFaction.id)}
                       title="Drag token to swap faction targets"
+                      style={{
+                        background: factionColors[targetFaction.id],
+                        borderColor: factionColors[targetFaction.id],
+                      }}
                     >
                       <FactionIcon className="faction-token-icon" name={targetFaction.icon} />
-                      <span>{targetFaction.name}</span>
                     </button>
                   ) : (
                     <div className="intent-vertex-empty">No assigned target</div>
@@ -156,13 +161,16 @@ export function VectorStarControls({
               <button
                 type="button"
                 key={faction.id}
-                className="faction-token"
+                className="faction-token faction-token-dot"
                 draggable
                 onDragStart={(event) => handleDragStart(event, faction.id)}
                 title="Drag token to a vector vertex"
+                style={{
+                  background: factionColors[faction.id],
+                  borderColor: factionColors[faction.id],
+                }}
               >
                 <FactionIcon className="faction-token-icon" name={faction.icon} />
-                <span>{faction.name}</span>
               </button>
             ))}
           </div>

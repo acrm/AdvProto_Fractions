@@ -9,6 +9,7 @@ interface GameControlPanelProps {
   playerIntent: PlayerIntent
   forecast: TurnForecast
   lastOutcome: SessionOutcome | null
+  onSelectFaction: (factionId: string) => void
   onSetIntentValue: (vector: ActivityVectorName, value: number) => void
   onSetIntentTarget: (vector: ActivityVectorName, factionId: string) => void
   onResetIntent: () => void
@@ -28,6 +29,7 @@ export function GameControlPanel({
   playerIntent,
   forecast,
   lastOutcome,
+  onSelectFaction,
   onSetIntentValue,
   onSetIntentTarget,
   onResetIntent,
@@ -36,19 +38,32 @@ export function GameControlPanel({
   onResetCampaign,
 }: GameControlPanelProps) {
   const selectedObjectives = gameState.seasonState.objectives.filter((objective) => objective.factionId === selectedFaction.id)
-  const recentIntel = gameState.seasonState.intel.slice(-4)
-  const recentLogs = gameState.seasonState.logs.slice(-4)
+  const recentIntel = gameState.seasonState.intel
+    .filter((intel) => intel.aboutFactionId === selectedFaction.id)
+    .slice(-5)
+  const recentLogs = gameState.seasonState.logs.slice(-6)
+  const factionPalette = ['#b82030', '#c8922a', '#2a8c50', '#7040a8', '#cc7820', '#2870b8', '#a83060']
+  const factionColors = Object.fromEntries(
+    gameState.factions.map((faction, index) => [faction.id, faction.isPlayer ? '#c8a870' : factionPalette[index % factionPalette.length]]),
+  ) as Record<string, string>
 
   return (
     <aside className="game-side-panel">
       <section className="panel-section panel-section-header">
-        <div>
-          <p className="eyebrow">Campaign</p>
-          <h2>Season {gameState.seasonState.seasonNumber}</h2>
-          <p className="subline">
-            Session {gameState.seasonState.sessionIndex}/{gameState.seasonState.maxSessions}
-          </p>
-          <p className="panel-note">{gameState.seasonState.briefing}</p>
+        <div className="campaign-header-row">
+          <div>
+            <p className="eyebrow">Campaign Status</p>
+            <h2>Season {gameState.seasonState.seasonNumber}</h2>
+            <p className="subline">
+              Iteration {gameState.seasonState.sessionIndex}/{gameState.seasonState.maxSessions}
+            </p>
+            <p className="panel-note">{gameState.seasonState.briefing}</p>
+          </div>
+          <div className="control-actions control-actions-header">
+            <button onClick={onRunSession} disabled={gameState.completed}>Commit Iteration</button>
+            <button className="ghost-button" onClick={onNewCampaign}>New Campaign</button>
+            <button className="ghost-button" onClick={onResetCampaign}>Reset Seed</button>
+          </div>
         </div>
         <div className="hud-grid">
           <div>
@@ -81,6 +96,7 @@ export function GameControlPanel({
 
         <VectorStarControls
           factions={gameState.factions}
+          factionColors={factionColors}
           playerIntent={playerIntent}
           forecast={forecast}
           onSetIntentValue={onSetIntentValue}
@@ -106,12 +122,6 @@ export function GameControlPanel({
           </div>
         </div>
 
-        <div className="control-actions">
-          <button onClick={onRunSession} disabled={gameState.completed}>Commit Iteration</button>
-          <button className="ghost-button" onClick={onNewCampaign}>New Campaign</button>
-          <button className="ghost-button" onClick={onResetCampaign}>Reset Seed</button>
-        </div>
-
         <p className="panel-note">
           Intent vector is always unit length. You redistribute one fixed direction budget across five components.
         </p>
@@ -119,6 +129,25 @@ export function GameControlPanel({
       </section>
 
       <section className="panel-section">
+        <p className="eyebrow">Faction List</p>
+        <ul className="faction-roster-list">
+          {gameState.factions.map((faction) => (
+            <li key={faction.id}>
+              <button
+                type="button"
+                className={`faction-roster-item ${selectedFaction.id === faction.id ? 'faction-roster-item-active' : ''}`}
+                onClick={() => onSelectFaction(faction.id)}
+              >
+                <span className="faction-roster-color" style={{ background: factionColors[faction.id] }} />
+                <FactionIcon name={faction.icon} />
+                <span>{faction.name}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="panel-section panel-section-fill">
         <p className="eyebrow">Faction Focus</p>
         <h3 className="faction-heading"><FactionIcon name={selectedFaction.icon} /> {selectedFaction.name}</h3>
         <p className="panel-note">{selectedFaction.profile.doctrine}</p>
@@ -150,11 +179,8 @@ export function GameControlPanel({
             </li>
           ))}
         </ul>
-      </section>
-
-      <section className="panel-section panel-section-split">
         <div>
-          <p className="eyebrow">Intel</p>
+          <p className="eyebrow">Intel On Selected Faction</p>
           <ul className="compact-list">
             {recentIntel.map((intel) => (
               <li key={intel.id}>
@@ -165,7 +191,7 @@ export function GameControlPanel({
           </ul>
         </div>
         <div>
-          <p className="eyebrow">Resolution Feed</p>
+          <p className="eyebrow">Recent Resolution Feed</p>
           <ul className="compact-list">
             {recentLogs.map((logLine, index) => (
               <li key={`${logLine}-${index}`}>{logLine}</li>

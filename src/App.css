@@ -5,7 +5,7 @@
 
 .game-screen {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) max(25%, 380px);
+  grid-template-columns: 1fr 1fr;
   gap: 0;
   height: 100dvh;
   padding: 0;
@@ -127,6 +127,12 @@
   overflow: auto;
   min-height: 0;
   align-content: start;
+  grid-template-rows: auto auto auto minmax(0, 1fr);
+}
+
+.campaign-header-row {
+  display: grid;
+  gap: 0.75rem;
 }
 
 .panel-section {
@@ -172,6 +178,10 @@
   align-items: start;
   gap: 0.75rem;
   margin-bottom: 0.85rem;
+}
+
+.control-actions-header {
+  margin-top: 0.25rem;
 }
 
 .intent-pool-label {
@@ -334,13 +344,26 @@ button.faction-token {
   cursor: grab;
 }
 
+button.faction-token-dot {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  padding: 0;
+  justify-content: center;
+  box-shadow: inset 0 0 0 1px rgba(10, 6, 3, 0.4), 0 0 0 1px rgba(255, 230, 180, 0.08);
+}
+
+button.faction-token-dot .faction-token-icon {
+  color: #140a04;
+}
+
 .faction-token:active {
   cursor: grabbing;
 }
 
 button.faction-token-assigned {
-  width: 100%;
-  justify-content: center;
+  width: 2.1rem;
+  margin: 0 auto;
 }
 
 .faction-token-icon {
@@ -365,6 +388,42 @@ button.faction-token-assigned {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+.faction-roster-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.faction-roster-item {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 0.8rem 1rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.45rem;
+  text-align: left;
+  background: rgba(18, 10, 4, 0.78);
+  border-color: #3d2010;
+}
+
+.faction-roster-item-active {
+  border-color: #c8952a;
+  box-shadow: 0 0 0 1px rgba(200, 149, 42, 0.2);
+}
+
+.faction-roster-color {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  border: 1px solid rgba(10, 6, 3, 0.4);
+}
+
+.panel-section-fill {
+  min-height: 0;
+  overflow: auto;
 }
 
 .control-actions {
