@@ -127,12 +127,7 @@
   overflow: hidden;
   min-height: 0;
   align-content: start;
-  grid-template-rows: auto auto auto minmax(0, 1fr);
-}
-
-.campaign-header-row {
-  display: grid;
-  gap: 0.75rem;
+  grid-template-rows: auto auto auto auto minmax(0, 1fr);
 }
 
 .panel-section {
@@ -142,17 +137,29 @@
   background: rgba(18, 10, 4, 0.88);
 }
 
+.panel-section-status {
+  padding: 0.45rem 0.65rem;
+}
+
+.panel-section-status h2 {
+  margin-top: 0.1rem;
+}
+
+.panel-section-status .subline {
+  margin: 0.1rem 0 0;
+}
+
 .panel-section-header {
   display: grid;
   gap: 0.55rem;
 }
 
-.game-side-panel > .panel-section:nth-child(2) {
+.game-side-panel > .panel-section:nth-child(3) {
   max-height: 44dvh;
   overflow: auto;
 }
 
-.game-side-panel > .panel-section:nth-child(3) {
+.game-side-panel > .panel-section:nth-child(4) {
   max-height: 19dvh;
   overflow: auto;
 }

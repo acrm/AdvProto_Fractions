@@ -49,21 +49,20 @@ export function GameControlPanel({
 
   return (
     <aside className="game-side-panel">
+      <section className="panel-section panel-section-status">
+        <p className="eyebrow">Campaign Status</p>
+        <h2>Season {gameState.seasonState.seasonNumber}</h2>
+        <p className="subline">
+          Iteration {gameState.seasonState.sessionIndex}/{gameState.seasonState.maxSessions}
+        </p>
+      </section>
+
       <section className="panel-section panel-section-header">
-        <div className="campaign-header-row">
-          <div>
-            <p className="eyebrow">Campaign Status</p>
-            <h2>Season {gameState.seasonState.seasonNumber}</h2>
-            <p className="subline">
-              Iteration {gameState.seasonState.sessionIndex}/{gameState.seasonState.maxSessions}
-            </p>
-            <p className="panel-note">{gameState.seasonState.briefing}</p>
-          </div>
-          <div className="control-actions control-actions-header">
-            <button onClick={onRunSession} disabled={gameState.completed}>Commit Iteration</button>
-            <button className="ghost-button" onClick={onNewCampaign}>New Campaign</button>
-            <button className="ghost-button" onClick={onResetCampaign}>Reset Seed</button>
-          </div>
+        <p className="panel-note">{gameState.seasonState.briefing}</p>
+        <div className="control-actions control-actions-header">
+          <button onClick={onRunSession} disabled={gameState.completed}>Commit Iteration</button>
+          <button className="ghost-button" onClick={onNewCampaign}>New Campaign</button>
+          <button className="ghost-button" onClick={onResetCampaign}>Reset Seed</button>
         </div>
         <div className="hud-grid">
           <div>
