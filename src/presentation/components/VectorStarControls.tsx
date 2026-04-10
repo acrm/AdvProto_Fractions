@@ -100,6 +100,11 @@ export function VectorStarControls({
 
           return (
             <div className="intent-ray" key={vector} style={rayStyle}>
+              <div className="intent-ray-label" title={VECTOR_HINTS[vector]}>
+                <FontAwesomeIcon icon={VECTOR_ICONS[vector]} fixedWidth />
+                <span>{VECTOR_LABELS[vector]}</span>
+              </div>
+
               <div className="intent-ray-track">
                 <input
                   aria-label={VECTOR_LABELS[vector]}
@@ -113,34 +118,26 @@ export function VectorStarControls({
                 />
               </div>
 
-              <div className="intent-vertex" onDragOver={handleDragOver} onDrop={(event) => handleDrop(event, vector)}>
-                <div className="intent-vertex-card">
-                  <div className="intent-vertex-title" title={VECTOR_HINTS[vector]}>
-                    <FontAwesomeIcon icon={VECTOR_ICONS[vector]} fixedWidth />
-                    <span>{VECTOR_LABELS[vector]}</span>
-                  </div>
-                  <div className="intent-vertex-values">
-                    <span>{formatSigned(currentValue)}</span>
-                    <span className="intent-vertex-effective">→ {formatSigned(effectiveValue)}</span>
-                  </div>
-                  {targetFaction ? (
-                    <button
-                      type="button"
-                      className="faction-token faction-token-assigned faction-token-dot"
-                      draggable
-                      onDragStart={(event) => handleDragStart(event, targetFaction.id)}
-                      title="Drag token to swap faction targets"
-                      style={{
-                        background: factionColors[targetFaction.id],
-                        borderColor: factionColors[targetFaction.id],
-                      }}
-                    >
-                      <FactionIcon className="faction-token-icon" name={targetFaction.icon} />
-                    </button>
-                  ) : (
-                    <div className="intent-vertex-empty">No assigned target</div>
-                  )}
-                </div>
+              <div className="intent-ray-end" onDragOver={handleDragOver} onDrop={(event) => handleDrop(event, vector)}>
+                <span className="intent-ray-value">{formatSigned(currentValue)}</span>
+                <span className="intent-ray-effective">→ {formatSigned(effectiveValue)}</span>
+                {targetFaction ? (
+                  <button
+                    type="button"
+                    className="faction-token faction-token-assigned faction-token-dot"
+                    draggable
+                    onDragStart={(event) => handleDragStart(event, targetFaction.id)}
+                    title="Drag token to swap faction targets"
+                    style={{
+                      background: factionColors[targetFaction.id],
+                      borderColor: factionColors[targetFaction.id],
+                    }}
+                  >
+                    <FactionIcon className="faction-token-icon" name={targetFaction.icon} />
+                  </button>
+                ) : (
+                  <div className="intent-ray-socket-empty" title="Drop faction token here">+</div>
+                )}
               </div>
             </div>
           )

@@ -255,9 +255,9 @@
 
 .intent-star-board {
   position: relative;
-  width: min(100%, 360px);
-  height: 340px;
-  min-height: 340px;
+  width: min(100%, 400px);
+  height: 380px;
+  min-height: 380px;
   margin: 0 auto;
 }
 
@@ -265,73 +265,77 @@
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 168px;
+  width: 186px;
   height: 0;
   transform: rotate(var(--ray-angle));
   transform-origin: 0 0;
+}
+
+.intent-ray-label {
+  position: absolute;
+  left: 14px;
+  top: -26px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: #f0ddb8;
+  font-size: 0.64rem;
+  font-family: 'Cinzel', Georgia, serif;
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 2;
 }
 
 .intent-ray-track {
   position: absolute;
   left: 12px;
   top: -10px;
-  width: 136px;
+  width: 150px;
+  z-index: 5;
 }
 
 .intent-ray-slider {
-  width: 136px;
+  width: 150px;
   margin: 0;
   accent-color: #c8952a;
+  position: relative;
+  z-index: 6;
 }
 
-.intent-vertex {
+.intent-ray-end {
   position: absolute;
-  left: 164px;
+  left: 176px;
   top: 0;
-  transform: translate(-50%, -50%);
-}
-
-.intent-vertex-card {
-  width: 132px;
-  border: 1px solid #3d2010;
-  border-radius: 6px;
-  background: rgba(14, 8, 4, 0.97);
-  padding: 0.4rem;
+  transform: translate(-50%, -50%) rotate(calc(-1 * var(--ray-angle)));
   display: grid;
-  gap: 0.25rem;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-  transform: rotate(calc(-1 * var(--ray-angle)));
+  justify-items: center;
+  gap: 0.08rem;
+  z-index: 3;
 }
 
-.intent-vertex-title {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  color: #f0ddb8;
-  font-size: 0.62rem;
-  line-height: 1.2;
-  font-family: 'Cinzel', Georgia, serif;
-}
-
-.intent-vertex-values {
-  display: flex;
-  justify-content: space-between;
-  gap: 0.3rem;
+.intent-ray-value,
+.intent-ray-effective {
   font-size: 0.64rem;
   color: #c8952a;
+  line-height: 1;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.55);
 }
 
-.intent-vertex-effective {
+.intent-ray-effective {
   color: #e8c870;
 }
 
-.intent-vertex-empty {
-  border: 1px dashed #3d2010;
-  border-radius: 4px;
-  padding: 0.34rem 0.55rem;
-  text-align: center;
-  color: #5c3a18;
-  font-size: 0.72rem;
+.intent-ray-socket-empty {
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 50%;
+  border: 1px dashed #8e6a3e;
+  color: #8e6a3e;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
 }
 
 .intent-reserve-row {
@@ -569,28 +573,28 @@ button:disabled {
 
   .intent-star-board {
     width: min(100%, 320px);
-    height: 300px;
+    height: 312px;
   }
 
   .intent-ray {
-    width: 148px;
+    width: 154px;
+  }
+
+  .intent-ray-label {
+    top: -24px;
+    font-size: 0.6rem;
   }
 
   .intent-ray-track {
-    width: 120px;
+    width: 124px;
   }
 
   .intent-ray-slider {
-    width: 120px;
+    width: 124px;
   }
 
-  .intent-vertex {
-    left: 144px;
-  }
-
-  .intent-vertex-card {
-    width: 114px;
-    padding: 0.34rem;
+  .intent-ray-end {
+    left: 148px;
   }
 
   button.faction-token {
