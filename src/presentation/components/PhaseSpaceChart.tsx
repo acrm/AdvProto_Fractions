@@ -149,24 +149,17 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
   const handleWheel = (event: ReactWheelEvent<SVGSVGElement>) => {
     event.preventDefault()
     const pointer = mapClientPointToViewBox(event.currentTarget, event.clientX, event.clientY, viewWidth, viewHeight)
-
-    setZoom((currentZoom) => {
-      const nextZoom = clamp(
-        event.deltaY > 0 ? currentZoom / ZOOM_FACTOR : currentZoom * ZOOM_FACTOR,
-        MIN_ZOOM,
-        MAX_ZOOM,
-      )
-
-      setPan((currentPan) => {
-        const worldX = (pointer.x - currentPan.x) / currentZoom
-        const worldY = (pointer.y - currentPan.y) / currentZoom
-        return {
-          x: pointer.x - worldX * nextZoom,
-          y: pointer.y - worldY * nextZoom,
-        }
-      })
-
-      return nextZoom
+    const nextZoom = clamp(
+      event.deltaY > 0 ? zoom / ZOOM_FACTOR : zoom * ZOOM_FACTOR,
+      MIN_ZOOM,
+      MAX_ZOOM,
+    )
+    const worldX = (pointer.x - pan.x) / zoom
+    const worldY = (pointer.y - pan.y) / zoom
+    setZoom(nextZoom)
+    setPan({
+      x: pointer.x - worldX * nextZoom,
+      y: pointer.y - worldY * nextZoom,
     })
   }
 
