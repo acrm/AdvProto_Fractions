@@ -12,3 +12,4 @@
 - 2026w10-0.10 — board interaction + zoom-stable dots + normalized vector intent with faction targets
 - 2026w10-0.11 — deep zoom, strict unit intent vector, unique faction target drag-drop, North Gate rename, click hit-test fix
 - 2026w10-0.12 — Font Awesome faction icons, fixed zoom-to-cursor mapping, seeded target assignments, swap drag-drop, and star-shaped vector controls
+- 2026w10-0.13 — fix oversized Font Awesome icons in phase board UI
