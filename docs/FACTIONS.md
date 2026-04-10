@@ -3,7 +3,7 @@
 ## North Gate Compact
 - Sphere: Political
 - Leader: Magistrate Elira Voss
-- Base: Nor's Gate Council Quarter
+- Base: North Gate Council Quarter
 - Doctrine: Rule the gate, license the frontier, tax every victory.
 - Methods: Charters, sheriffs, council decrees, selective legitimacy.
 - Strategic Goal: Convert the frontier into governable colonial territory.
@@ -43,7 +43,7 @@
 ## Grey Lantern Guild
 - Sphere: Independent guild / player faction
 - Leader: Mara Flint
-- Base: Grey Lantern Hall in Nor's Gate
+- Base: Grey Lantern Hall in North Gate
 - Doctrine: Stay small, move fast, and sell leverage before anyone can own you.
 - Methods: Free contracts, deniable crews, fixers, smugglers, scouts.
 - Strategic Goal: Carve out a durable share of power without becoming a pawn of the great factions.

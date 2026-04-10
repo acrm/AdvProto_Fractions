@@ -14,18 +14,19 @@ export interface NarrativeContact {
 
 export interface NarrativeFactionSeed {
   name: string
+  icon: string
   profile: FactionProfile
 }
 
 export const NORS_GATE_OVERVIEW = {
-  city: "Nor's Gate",
+  city: 'North Gate',
   premise:
-    "The only open gate into the under-country stands beneath Nor's Gate, a hard frontier city where councils, temples, cartels, scholars, and mercenary banners compete to civilize and exploit a continent-sized dungeon.",
+    'The only open gate into the under-country stands beneath North Gate, a hard frontier city where councils, temples, cartels, scholars, and mercenary banners compete to civilize and exploit a continent-sized dungeon.',
 }
 
 export const NARRATIVE_LOCATIONS: NarrativeLocation[] = [
   {
-    name: "Nor's Gate",
+    name: 'North Gate',
     tag: 'city',
     description: 'A smoke-choked boom city pressed around the only open descent into the under-country.',
   },
@@ -68,17 +69,19 @@ export const NARRATIVE_CONTACTS: NarrativeContact[] = [
 export const FACTION_SEEDS: NarrativeFactionSeed[] = [
   {
     name: 'North Gate Compact',
+    icon: 'C',
     profile: {
       sphere: 'political',
       leaderName: 'Magistrate Elira Voss',
       doctrine: 'Rule the gate, license the frontier, tax every victory.',
       methods: 'charters, councils, sheriffs, and selective legitimacy',
-      homeBase: "Nor's Gate Council Quarter",
+      homeBase: 'North Gate Council Quarter',
       agenda: 'Turn the under-country into a governable colonial dominion.',
     },
   },
   {
     name: 'Ember Reliquary',
+    icon: 'R',
     profile: {
       sphere: 'religious',
       leaderName: 'Prelate Amon Kest',
@@ -90,6 +93,7 @@ export const FACTION_SEEDS: NarrativeFactionSeed[] = [
   },
   {
     name: 'Gilded Ledger Exchange',
+    icon: '$',
     profile: {
       sphere: 'economic',
       leaderName: 'Silas Rook',
@@ -101,6 +105,7 @@ export const FACTION_SEEDS: NarrativeFactionSeed[] = [
   },
   {
     name: 'Argent Survey Collegium',
+    icon: 'S',
     profile: {
       sphere: 'scientific',
       leaderName: 'Professor Talandra Mire',
@@ -112,6 +117,7 @@ export const FACTION_SEEDS: NarrativeFactionSeed[] = [
   },
   {
     name: 'Iron Banner Companies',
+    icon: 'M',
     profile: {
       sphere: 'military',
       leaderName: 'Marshal Corven Draik',
@@ -123,6 +129,7 @@ export const FACTION_SEEDS: NarrativeFactionSeed[] = [
   },
   {
     name: 'Grey Lantern Guild',
+    icon: 'G',
     profile: {
       sphere: 'guild',
       leaderName: 'Mara Flint',

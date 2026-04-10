@@ -40,7 +40,7 @@ Forecast requirements:
 - Intel items are discovered through session progress.
 - Each intel item stores confidence and reliability.
 - Deceptive intel is possible and explicitly modeled.
-- Intel should be phrased as short diegetic reports tied to contacts and locations in the Nor's Gate frontier.
+- Intel should be phrased as short diegetic reports tied to contacts and locations in the North Gate frontier.
 - Contradictory high-confidence intel should trigger a doctrine review prompt.
 
 ## Five Activity Vectors

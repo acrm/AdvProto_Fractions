@@ -83,6 +83,16 @@ function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value))
 }
 
+function vectorMagnitude(adj: ActivityVectorState): number {
+  return Math.sqrt(
+    adj.territorialPressure ** 2 +
+    adj.diplomaticMomentum ** 2 +
+    adj.economicThroughput ** 2 +
+    adj.covertTempo ** 2 +
+    adj.deterrencePosture ** 2,
+  )
+}
+
 function objectiveCountForFaction(randValue: number): number {
   if (randValue < 0.34) return 3
   if (randValue < 0.67) return 4
@@ -106,52 +116,90 @@ export function createZeroVectorState(): ActivityVectorState {
   }
 }
 
-const INTENT_BUDGET = 18
+const UNIT_VECTOR_EPS = 1e-6
+const INTENT_EFFECT_SCALE = 18
 
-export function normalizeIntentAdjustments(adj: ActivityVectorState): ActivityVectorState {
-  const magnitude = Math.sqrt(
-    adj.territorialPressure ** 2 +
-    adj.diplomaticMomentum ** 2 +
-    adj.economicThroughput ** 2 +
-    adj.covertTempo ** 2 +
-    adj.deterrencePosture ** 2,
-  )
-  if (magnitude < 0.01 || magnitude <= INTENT_BUDGET) return { ...adj }
-  const scale = INTENT_BUDGET / magnitude
+export function createRandomUnitVector(seed: number): ActivityVectorState {
+  const rng = createSeededRandom(seed + 191)
+  const raw: ActivityVectorState = {
+    territorialPressure: rng.next() * 2 - 1,
+    diplomaticMomentum: rng.next() * 2 - 1,
+    economicThroughput: rng.next() * 2 - 1,
+    covertTempo: rng.next() * 2 - 1,
+    deterrencePosture: rng.next() * 2 - 1,
+  }
+
+  const magnitude = vectorMagnitude(raw)
+  if (magnitude <= UNIT_VECTOR_EPS) {
+    return {
+      territorialPressure: 1,
+      diplomaticMomentum: 0,
+      economicThroughput: 0,
+      covertTempo: 0,
+      deterrencePosture: 0,
+    }
+  }
+
   return {
-    territorialPressure: Math.round(adj.territorialPressure * scale * 10) / 10,
-    diplomaticMomentum: Math.round(adj.diplomaticMomentum * scale * 10) / 10,
-    economicThroughput: Math.round(adj.economicThroughput * scale * 10) / 10,
-    covertTempo: Math.round(adj.covertTempo * scale * 10) / 10,
-    deterrencePosture: Math.round(adj.deterrencePosture * scale * 10) / 10,
+    territorialPressure: raw.territorialPressure / magnitude,
+    diplomaticMomentum: raw.diplomaticMomentum / magnitude,
+    economicThroughput: raw.economicThroughput / magnitude,
+    covertTempo: raw.covertTempo / magnitude,
+    deterrencePosture: raw.deterrencePosture / magnitude,
   }
 }
 
-export function createEmptyPlayerIntent(): PlayerIntent {
+function scaleIntentAdjustments(adj: ActivityVectorState): ActivityVectorState {
   return {
-    adjustments: createZeroVectorState(),
+    territorialPressure: adj.territorialPressure * INTENT_EFFECT_SCALE,
+    diplomaticMomentum: adj.diplomaticMomentum * INTENT_EFFECT_SCALE,
+    economicThroughput: adj.economicThroughput * INTENT_EFFECT_SCALE,
+    covertTempo: adj.covertTempo * INTENT_EFFECT_SCALE,
+    deterrencePosture: adj.deterrencePosture * INTENT_EFFECT_SCALE,
+  }
+}
+
+export function normalizeIntentAdjustments(adj: ActivityVectorState, fallbackSeed: number): ActivityVectorState {
+  const magnitude = vectorMagnitude(adj)
+  if (magnitude <= UNIT_VECTOR_EPS) {
+    return createRandomUnitVector(fallbackSeed)
+  }
+
+  return {
+    territorialPressure: adj.territorialPressure / magnitude,
+    diplomaticMomentum: adj.diplomaticMomentum / magnitude,
+    economicThroughput: adj.economicThroughput / magnitude,
+    covertTempo: adj.covertTempo / magnitude,
+    deterrencePosture: adj.deterrencePosture / magnitude,
+  }
+}
+
+export function createEmptyPlayerIntent(seed: number): PlayerIntent {
+  return {
+    adjustments: createRandomUnitVector(seed),
     targets: {},
   }
 }
 
 function sumPositiveIntent(intent: PlayerIntent): number {
-  return Object.values(intent.adjustments).reduce((total, value) => total + Math.max(0, value), 0)
+  return Object.values(scaleIntentAdjustments(intent.adjustments)).reduce((total, value) => total + Math.max(0, value), 0)
 }
 
 function sumNegativeIntent(intent: PlayerIntent): number {
-  return Object.values(intent.adjustments).reduce((total, value) => total + Math.abs(Math.min(0, value)), 0)
+  return Object.values(scaleIntentAdjustments(intent.adjustments)).reduce((total, value) => total + Math.abs(Math.min(0, value)), 0)
 }
 
 export function deriveStrategyFromIntent(intent: PlayerIntent): PlayerStrategy {
+  const scaled = scaleIntentAdjustments(intent.adjustments)
   const progressBias =
-    intent.adjustments.territorialPressure +
-    intent.adjustments.diplomaticMomentum +
-    intent.adjustments.economicThroughput
+    scaled.territorialPressure +
+    scaled.diplomaticMomentum +
+    scaled.economicThroughput
 
   const sabotageBias =
-    intent.adjustments.covertTempo +
-    intent.adjustments.deterrencePosture -
-    Math.min(0, intent.adjustments.diplomaticMomentum)
+    scaled.covertTempo +
+    scaled.deterrencePosture -
+    Math.min(0, scaled.diplomaticMomentum)
 
   if (sabotageBias - progressBias >= 8) return 'sabotage'
   if (progressBias - sabotageBias >= 8) return 'progress'
@@ -164,19 +212,21 @@ function intentResourceDelta(intent: PlayerIntent): number {
 }
 
 function intentExposureDelta(intent: PlayerIntent, strategy: PlayerStrategy): number {
-  const covertWeight = Math.max(0, intent.adjustments.covertTempo)
-  const deterrenceWeight = Math.max(0, intent.adjustments.deterrencePosture)
-  const diplomaticRelief = Math.max(0, intent.adjustments.diplomaticMomentum)
+  const scaled = scaleIntentAdjustments(intent.adjustments)
+  const covertWeight = Math.max(0, scaled.covertTempo)
+  const deterrenceWeight = Math.max(0, scaled.deterrencePosture)
+  const diplomaticRelief = Math.max(0, scaled.diplomaticMomentum)
   const base = strategy === 'sabotage' ? 5 : strategy === 'progress' ? 2 : 3
   return Math.max(1, Math.round(base + covertWeight / 4 + deterrenceWeight / 8 - diplomaticRelief / 10))
 }
 
 function intentScorePressure(intent: PlayerIntent): number {
+  const scaled = scaleIntentAdjustments(intent.adjustments)
   return Math.round(
-    intent.adjustments.territorialPressure * 0.4 +
-    intent.adjustments.economicThroughput * 0.4 +
-    intent.adjustments.diplomaticMomentum * 0.2 +
-    intent.adjustments.covertTempo * 0.15,
+    scaled.territorialPressure * 0.4 +
+    scaled.economicThroughput * 0.4 +
+    scaled.diplomaticMomentum * 0.2 +
+    scaled.covertTempo * 0.15,
   )
 }
 
@@ -202,6 +252,7 @@ function createFaction(index: number, factionCount: number): Faction {
   return {
     id: `f${index + 1}`,
     name: isPlayer ? `${name} (Player)` : name,
+    icon: factionSeed.icon,
     isPlayer,
     profile: factionSeed.profile,
     powerBase: isPlayer ? 52 : 62,
@@ -310,7 +361,7 @@ function nextVectorState(
 ): ActivityVectorState {
   const rng = createSeededRandom(rngSeed)
   const nextVectors = { ...current }
-  const adjustments = intent?.adjustments ?? createZeroVectorState()
+  const adjustments = scaleIntentAdjustments(intent?.adjustments ?? createZeroVectorState())
 
   const strategyBonus = strategy === 'progress' ? 8 : strategy === 'sabotage' ? -6 : 2
   nextVectors.territorialPressure = clamp(nextVectors.territorialPressure + rng.nextInt(-6, 9) + strategyBonus + adjustments.territorialPressure, -100, 100)
@@ -347,7 +398,7 @@ export function forecastPlayerTurn(state: GameState, intent: PlayerIntent): Turn
   }
 
   const derivedStrategy = deriveStrategyFromIntent(intent)
-  const normAdj = normalizeIntentAdjustments(intent.adjustments)
+  const normAdj = normalizeIntentAdjustments(intent.adjustments, state.seed + state.seasonState.seasonNumber * 100 + state.seasonState.sessionIndex)
   const normIntent: PlayerIntent = { ...intent, adjustments: normAdj }
 
   return {
@@ -518,7 +569,7 @@ export function createInitialGameState(seed: number, config: GameConfig = create
   }
 }
 
-export function runSession(state: GameState, strategy: PlayerStrategy, playerIntent: PlayerIntent = createEmptyPlayerIntent()): { nextState: GameState; outcome: SessionOutcome } {
+export function runSession(state: GameState, strategy: PlayerStrategy, playerIntent?: PlayerIntent): { nextState: GameState; outcome: SessionOutcome } {
   if (state.completed) {
     return {
       nextState: state,
@@ -532,17 +583,18 @@ export function runSession(state: GameState, strategy: PlayerStrategy, playerInt
   }
 
   const season = state.seasonState
+  const effectiveIntent = playerIntent ?? createEmptyPlayerIntent(state.seed + season.seasonNumber * 100 + season.sessionIndex)
   const seasonSeed = state.seed + season.seasonNumber * 1000 + season.sessionIndex * 57
 
   // Normalize player intent before applying
-  const normAdj = normalizeIntentAdjustments(playerIntent.adjustments)
-  const normIntent: PlayerIntent = { ...playerIntent, adjustments: normAdj }
+  const normAdj = normalizeIntentAdjustments(effectiveIntent.adjustments, seasonSeed)
+  const normIntent: PlayerIntent = { ...effectiveIntent, adjustments: normAdj }
 
   // Build faction pressure map from player targets
   const factionPressure = new Map<string, number>()
   for (const [vector, factionId] of Object.entries(normIntent.targets)) {
     if (!factionId) continue
-    const contribution = Math.abs(normAdj[vector as keyof typeof normAdj] ?? 0)
+    const contribution = Math.abs((normAdj[vector as keyof typeof normAdj] ?? 0) * INTENT_EFFECT_SCALE)
     factionPressure.set(factionId, (factionPressure.get(factionId) ?? 0) + contribution)
   }
 

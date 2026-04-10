@@ -3,6 +3,9 @@ import type { PointerEvent as ReactPointerEvent, WheelEvent as ReactWheelEvent }
 import { ActivityVectorState, Faction } from '../../domain/gameModel'
 
 const DRAG_THRESHOLD_PX = 4
+const MIN_ZOOM = 0.2
+const MAX_ZOOM = 240
+const ZOOM_FACTOR = 1.18
 
 interface PhaseSpaceChartProps {
   factions: Faction[]
@@ -134,17 +137,67 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
     const pointerY = ((event.clientY - rect.top) / rect.height) * viewHeight
 
     setZoom((currentZoom) => {
-      const nextZoom = clamp(currentZoom + (event.deltaY > 0 ? -0.12 : 0.12), 0.65, 2.4)
-      const worldX = (pointerX - pan.x) / currentZoom
-      const worldY = (pointerY - pan.y) / currentZoom
+      const nextZoom = clamp(
+        event.deltaY > 0 ? currentZoom / ZOOM_FACTOR : currentZoom * ZOOM_FACTOR,
+        MIN_ZOOM,
+        MAX_ZOOM,
+      )
 
-      setPan({
-        x: pointerX - worldX * nextZoom,
-        y: pointerY - worldY * nextZoom,
+      setPan((currentPan) => {
+        const worldX = (pointerX - currentPan.x) / currentZoom
+        const worldY = (pointerY - currentPan.y) / currentZoom
+        return {
+          x: pointerX - worldX * nextZoom,
+          y: pointerY - worldY * nextZoom,
+        }
       })
 
       return nextZoom
     })
+  }
+
+  const selectFactionAtPointer = (event: ReactPointerEvent<SVGSVGElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect()
+    const pointerX = ((event.clientX - rect.left) / rect.width) * viewWidth
+    const pointerY = ((event.clientY - rect.top) / rect.height) * viewHeight
+    const candidates: Array<{ id: string; x: number; y: number; hitRadius: number }> = []
+
+    candidates.push({
+      id: playerFaction.id,
+      x: centerX * zoom + pan.x,
+      y: centerY * zoom + pan.y,
+      hitRadius: 20,
+    })
+
+    factions.forEach((faction) => {
+      if (faction.isPlayer) return
+
+      const points = trajectoryPoints(faction, playerFaction, baseRadius, centerX, centerY)
+      const currentPoint = points[points.length - 1] ?? projectRelativePoint(faction.vectors, playerFaction.vectors, baseRadius, centerX, centerY)
+      const visibleRadius = pointRadius(faction.resourceStock, maxResource)
+
+      candidates.push({
+        id: faction.id,
+        x: currentPoint.x * zoom + pan.x,
+        y: currentPoint.y * zoom + pan.y,
+        hitRadius: Math.max(14, visibleRadius + 8),
+      })
+    })
+
+    let bestId: string | null = null
+    let bestDistance = Number.POSITIVE_INFINITY
+
+    candidates.forEach((candidate) => {
+      const dx = pointerX - candidate.x
+      const dy = pointerY - candidate.y
+      const distance = Math.sqrt(dx * dx + dy * dy)
+      if (distance <= candidate.hitRadius && distance < bestDistance) {
+        bestDistance = distance
+        bestId = candidate.id
+      }
+    })
+
+    if (bestId) onSelectFaction(bestId)
   }
 
   const handlePointerDown = (event: ReactPointerEvent<SVGSVGElement>) => {
@@ -180,6 +233,9 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
     if (event && event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId)
     }
+    if (event && !dragMovedRef.current) {
+      selectFactionAtPointer(event)
+    }
     setDragState((current) => ({ ...current, active: false }))
   }
 
@@ -210,23 +266,23 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
             r={baseRadius * ratio}
             fill="none"
             stroke="#183046"
-            strokeWidth={1}
+            strokeWidth={1 / zoom}
           />
         ))}
 
-        <line x1={centerX - baseRadius} y1={centerY} x2={centerX + baseRadius} y2={centerY} stroke="#26455f" strokeWidth={1.2} />
-        <line x1={centerX} y1={centerY - baseRadius} x2={centerX} y2={centerY + baseRadius} stroke="#26455f" strokeWidth={1.2} />
+        <line x1={centerX - baseRadius} y1={centerY} x2={centerX + baseRadius} y2={centerY} stroke="#26455f" strokeWidth={1.2 / zoom} />
+        <line x1={centerX} y1={centerY - baseRadius} x2={centerX} y2={centerY + baseRadius} stroke="#26455f" strokeWidth={1.2 / zoom} />
 
-        <text x={centerX + baseRadius + 18} y={centerY + 5} fontSize={15} fill="#d0d8e6">
+        <text x={centerX + baseRadius + 18 / zoom} y={centerY + 5 / zoom} fontSize={15 / zoom} fill="#d0d8e6">
           +Economic / +Diplomatic
         </text>
-        <text x={centerX - baseRadius - 18} y={centerY + 5} textAnchor="end" fontSize={15} fill="#d0d8e6">
+        <text x={centerX - baseRadius - 18 / zoom} y={centerY + 5 / zoom} textAnchor="end" fontSize={15 / zoom} fill="#d0d8e6">
           -Economic / -Diplomatic
         </text>
-        <text x={centerX + 2} y={centerY - baseRadius - 18} textAnchor="middle" fontSize={15} fill="#d0d8e6">
+        <text x={centerX + 2 / zoom} y={centerY - baseRadius - 18 / zoom} textAnchor="middle" fontSize={15 / zoom} fill="#d0d8e6">
           +Covert / +Deterrence
         </text>
-        <text x={centerX + 2} y={centerY + baseRadius + 24} textAnchor="middle" fontSize={15} fill="#d0d8e6">
+        <text x={centerX + 2 / zoom} y={centerY + baseRadius + 24 / zoom} textAnchor="middle" fontSize={15 / zoom} fill="#d0d8e6">
           -Covert / -Deterrence
         </text>
 
@@ -303,6 +359,7 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
           <li key={faction.id} className={selectedFactionId === faction.id ? 'legend-active' : ''}>
             <button type="button" className="legend-button" onClick={() => onSelectFaction(faction.id)}>
               <span className="legend-chip" style={{ background: faction.isPlayer ? '#111827' : COLORS[index % COLORS.length] }} />
+              <span className="legend-icon">{faction.icon}</span>
               {faction.name} {faction.isPlayer ? '(origin)' : ''}
             </button>
           </li>

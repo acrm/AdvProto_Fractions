@@ -8,5 +8,6 @@
 - 2026w10-0.6 — fix: lock tactical screen to single viewport
 - 2026w10-0.7 — fix: separate initial faction positions in phase board
 - 2026w10-0.8 — docs: focus doctrine advisory and player pivots
-- 2026w10-0.9 — add Nor's Gate narrative layer
+- 2026w10-0.9 — add North Gate narrative layer
 - 2026w10-0.10 — board interaction + zoom-stable dots + normalized vector intent with faction targets
+- 2026w10-0.11 — deep zoom, strict unit intent vector, unique faction target drag-drop, North Gate rename, click hit-test fix

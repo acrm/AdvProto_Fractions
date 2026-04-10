@@ -7,7 +7,7 @@
 - [x] Seasonal/session simulation baseline
 - [x] Application game store and persistence
 - [x] Base phase-space shell UI
-- [x] Nor's Gate faction identities, location seeds, and narrative flavor scaffolding
+- [x] North Gate faction identities, location seeds, and narrative flavor scaffolding
 - [ ] Seasonal doctrine recommendation generation
 - [ ] Doctrine vs override divergence tracking
 - [ ] Intel-confidence-driven pivot prompts

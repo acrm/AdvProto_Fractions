@@ -10,7 +10,7 @@ function isNarrativeReadyState(value: unknown): value is GameState {
   const candidate = value as GameState
   return Array.isArray(candidate.factions)
     && candidate.factions.length > 0
-    && candidate.factions.every((faction) => Boolean(faction.profile?.leaderName && faction.profile?.doctrine))
+    && candidate.factions.every((faction) => Boolean(faction.icon && faction.profile?.leaderName && faction.profile?.doctrine))
     && Boolean(candidate.seasonState?.briefing)
 }
 

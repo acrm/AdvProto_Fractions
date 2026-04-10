@@ -1,7 +1,7 @@
 # Narrative Layer
 
 ## Design Rule
-Phase Dominion should never feel like abstract number juggling. Every objective, conflict, relationship shift, and intel report must be readable as an event happening somewhere in the Nor's Gate frontier.
+Phase Dominion should never feel like abstract number juggling. Every objective, conflict, relationship shift, and intel report must be readable as an event happening somewhere in the North Gate frontier.
 
 ## Narrative Delivery Format
 - One-line faction doctrines.

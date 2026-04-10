@@ -62,7 +62,7 @@ Clean/DDD layers:
 - Seasonal doctrine concept documented as an advisory recommendation layer.
 - Explicit player override authority for doctrine divergence and tactical pivots.
 - Intel and deception signals designed to justify mid-season recommendation changes.
-- Nor's Gate narrative layer with faction doctrines, named locations, contact-sourced intel, and atmospheric session aftermath text.
+- North Gate narrative layer with faction doctrines, named locations, contact-sourced intel, and atmospheric session aftermath text.
 
 ## PWA
 

@@ -1,6 +1,6 @@
 # Locations
 
-## Nor's Gate
+## North Gate
 The boom city around the only open descent. Every faction keeps offices, warehouses, shrines, or barracks here. It is the political and logistical heart of the campaign.
 
 ## The Gate Market

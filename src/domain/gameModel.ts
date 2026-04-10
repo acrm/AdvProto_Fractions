@@ -48,6 +48,7 @@ export interface FactionProfile {
 export interface Faction {
   id: string
   name: string
+  icon: string
   isPlayer: boolean
   profile: FactionProfile
   powerBase: number

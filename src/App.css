@@ -104,6 +104,14 @@
   border-radius: 50%;
 }
 
+.legend-icon {
+  display: inline-flex;
+  width: 18px;
+  justify-content: center;
+  font-weight: 700;
+  color: #93c5fd;
+}
+
 .game-side-panel {
   display: grid;
   gap: 0.85rem;
@@ -176,9 +184,81 @@
 
 .intent-row-bottom {
   display: grid;
-  grid-template-columns: minmax(80px, 160px) minmax(0, 1fr);
+  grid-template-columns: minmax(120px, 1fr) minmax(110px, 180px) minmax(0, 1fr);
   align-items: center;
   gap: 0.5rem;
+}
+
+.intent-pool {
+  display: grid;
+  gap: 0.45rem;
+  border: 1px solid #1f2d3d;
+  border-radius: 10px;
+  padding: 0.5rem;
+  background: rgba(6, 12, 22, 0.75);
+}
+
+.intent-pool-label {
+  color: #8ca1bb;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.intent-pool-tokens {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+button.faction-token {
+  border: 1px solid #29415f;
+  background: #0b192d;
+  color: #dbeafe;
+  border-radius: 999px;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.74rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: grab;
+}
+
+.faction-token:active {
+  cursor: grabbing;
+}
+
+button.faction-token-assigned {
+  width: 100%;
+  justify-content: center;
+}
+
+.faction-token-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #122640;
+  color: #93c5fd;
+  font-weight: 700;
+}
+
+.intent-target-slot {
+  border: 1px dashed #29415f;
+  border-radius: 8px;
+  min-height: 34px;
+  display: grid;
+  align-items: center;
+  padding: 0.18rem;
+  background: #071121;
+}
+
+.intent-target-hint {
+  color: #6582a6;
+  font-size: 0.72rem;
+  text-align: center;
 }
 
 .intent-label {
