@@ -1,7 +1,7 @@
 {
   "name": "advproto-fractions",
   "private": true,
-  "version": "2026w10-0.18",
+  "version": "2026w10-0.19",
   "type": "module",
   "scripts": {
     "dev": "vite",

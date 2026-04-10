@@ -18,3 +18,4 @@
 - 2026w10-0.16 — panel re-layout 50-50 with top controls, vector tokens, roster and faction focus
 - 2026w10-0.17 — tighten panel layout blocks and preserve top/vector/list/focus hierarchy
 - 2026w10-0.18 — split campaign status into compact header block
+- 2026w10-0.19 — densify panel packing and move blocks per layout arrows

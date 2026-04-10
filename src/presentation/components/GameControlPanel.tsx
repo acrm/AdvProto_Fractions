@@ -50,21 +50,25 @@ export function GameControlPanel({
   return (
     <aside className="game-side-panel">
       <section className="panel-section panel-section-status">
-        <p className="eyebrow">Campaign Status</p>
-        <h2>Season {gameState.seasonState.seasonNumber}</h2>
-        <p className="subline">
-          Iteration {gameState.seasonState.sessionIndex}/{gameState.seasonState.maxSessions}
-        </p>
+        <div className="campaign-status-grid">
+          <div>
+            <p className="eyebrow">Campaign Status</p>
+            <h2>Season {gameState.seasonState.seasonNumber}</h2>
+            <p className="subline">
+              Iteration {gameState.seasonState.sessionIndex}/{gameState.seasonState.maxSessions}
+            </p>
+          </div>
+          <div className="control-actions control-actions-status">
+            <button onClick={onRunSession} disabled={gameState.completed}>Commit Iteration</button>
+            <button className="ghost-button" onClick={onNewCampaign}>New Campaign</button>
+            <button className="ghost-button" onClick={onResetCampaign}>Reset Seed</button>
+          </div>
+        </div>
       </section>
 
       <section className="panel-section panel-section-header">
         <p className="panel-note">{gameState.seasonState.briefing}</p>
-        <div className="control-actions control-actions-header">
-          <button onClick={onRunSession} disabled={gameState.completed}>Commit Iteration</button>
-          <button className="ghost-button" onClick={onNewCampaign}>New Campaign</button>
-          <button className="ghost-button" onClick={onResetCampaign}>Reset Seed</button>
-        </div>
-        <div className="hud-grid">
+        <div className="hud-grid hud-grid-compact">
           <div>
             <span className="hud-label">Score</span>
             <strong>{playerFaction.score}</strong>
@@ -85,22 +89,49 @@ export function GameControlPanel({
       </section>
 
       <section className="panel-section">
-        <div className="section-heading-row">
-          <div>
-            <p className="eyebrow">Command Vector</p>
-            <h3>Next Iteration Plan</h3>
-          </div>
-          <button className="ghost-button" onClick={onResetIntent}>Reset Plan</button>
-        </div>
+        <div className="vector-section-layout">
+          <div className="vector-section-summary">
+            <div className="section-heading-row">
+              <div>
+                <p className="eyebrow">Command Vector</p>
+                <h3>Next Iteration Plan</h3>
+              </div>
+              <button className="ghost-button" onClick={onResetIntent}>Reset Plan</button>
+            </div>
 
-        <VectorStarControls
-          factions={gameState.factions}
-          factionColors={factionColors}
-          playerIntent={playerIntent}
-          forecast={forecast}
-          onSetIntentValue={onSetIntentValue}
-          onSetIntentTarget={onSetIntentTarget}
-        />
+            <div className="forecast-grid">
+              <div>
+                <span className="hud-label">Derived Stance</span>
+                <strong>{forecast.derivedStrategy}</strong>
+              </div>
+              <div>
+                <span className="hud-label">Resource Delta</span>
+                <strong>{formatSigned(forecast.resourceDelta)}</strong>
+              </div>
+              <div>
+                <span className="hud-label">Exposure Delta</span>
+                <strong>{formatSigned(forecast.exposureDelta)}</strong>
+              </div>
+              <div>
+                <span className="hud-label">Score Pressure</span>
+                <strong>{formatSigned(forecast.scorePressure)}</strong>
+              </div>
+            </div>
+
+            <p className="panel-note">
+              Intent vector is always unit length. You redistribute one fixed direction budget across five components.
+            </p>
+            {lastOutcome ? <p className="outcome-line">{lastOutcome.summary}</p> : null}
+          </div>
+          <VectorStarControls
+            factions={gameState.factions}
+            factionColors={factionColors}
+            playerIntent={playerIntent}
+            forecast={forecast}
+            onSetIntentValue={onSetIntentValue}
+            onSetIntentTarget={onSetIntentTarget}
+          />
+        </div>
       </section>
 
       <section className="panel-section">
@@ -128,30 +159,6 @@ export function GameControlPanel({
         <p className="panel-note">{selectedFaction.profile.doctrine}</p>
         <p className="panel-note">Led by {selectedFaction.profile.leaderName} from {selectedFaction.profile.homeBase}.</p>
         <p className="panel-note">Current agenda: {selectedFaction.profile.agenda}</p>
-
-        <div className="forecast-grid">
-          <div>
-            <span className="hud-label">Derived Stance</span>
-            <strong>{forecast.derivedStrategy}</strong>
-          </div>
-          <div>
-            <span className="hud-label">Resource Delta</span>
-            <strong>{formatSigned(forecast.resourceDelta)}</strong>
-          </div>
-          <div>
-            <span className="hud-label">Exposure Delta</span>
-            <strong>{formatSigned(forecast.exposureDelta)}</strong>
-          </div>
-          <div>
-            <span className="hud-label">Score Pressure</span>
-            <strong>{formatSigned(forecast.scorePressure)}</strong>
-          </div>
-        </div>
-
-        <p className="panel-note">
-          Intent vector is always unit length. You redistribute one fixed direction budget across five components.
-        </p>
-        {lastOutcome ? <p className="outcome-line">{lastOutcome.summary}</p> : null}
 
         <div className="detail-grid">
           <div>
