@@ -21,3 +21,4 @@
 - 2026w10-0.19 — densify panel packing and move blocks per layout arrows
 - 2026w10-0.20 — pack status block, row-align faction list with command vector, remove chart legend
 - 2026w10-0.21 — compress status metrics into single inline row with briefing
+- 2026w10-0.22 — remove status metrics block, unify faction circle symbols, remove unit-vector plaque

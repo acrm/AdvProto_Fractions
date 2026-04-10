@@ -162,37 +162,6 @@
   gap: 0.3rem;
 }
 
-.status-meta-row {
-  margin-top: 0.2rem;
-  display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
-  gap: 0.35rem;
-  align-items: center;
-}
-
-.status-metrics-line {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.22rem 0.48rem;
-  align-items: center;
-  justify-content: flex-end;
-}
-
-.status-metric-item {
-  font-size: 0.66rem;
-  color: #f2e0bb;
-  line-height: 1.1;
-  white-space: nowrap;
-}
-
-.status-metric-label {
-  color: #8e6a3e;
-  font-family: 'Cinzel', Georgia, serif;
-  font-size: 0.56rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
 .hud-grid,
 .detail-grid,
 .forecast-grid {
@@ -250,7 +219,7 @@
 
 .vector-section-layout {
   display: grid;
-  grid-template-columns: minmax(220px, 0.95fr) minmax(0, 1.15fr);
+  grid-template-columns: 1fr;
   gap: 0.4rem;
   align-items: start;
 }
@@ -286,55 +255,17 @@
 
 .intent-star-board {
   position: relative;
-  width: min(100%, 280px);
-  height: 260px;
-  min-height: 260px;
+  width: min(100%, 360px);
+  height: 340px;
+  min-height: 340px;
   margin: 0 auto;
-}
-
-.intent-star-core {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 92px;
-  transform: translate(-50%, -50%);
-  border: 1px solid #5c3a14;
-  border-radius: 8px;
-  background: radial-gradient(circle at 50% 30%, rgba(35, 20, 8, 0.97), rgba(14, 8, 4, 0.99));
-  color: #f0d8a0;
-  padding: 0.45rem;
-  text-align: center;
-  box-shadow: 0 0 0 1px rgba(200, 149, 42, 0.12), inset 0 0 16px rgba(200, 149, 42, 0.04);
-}
-
-.intent-star-core-title {
-  display: block;
-  font-size: 0.52rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: #806040;
-  font-family: 'Cinzel', Georgia, serif;
-}
-
-.intent-star-core-value {
-  display: block;
-  margin-top: 0.2rem;
-  color: #f2e0bb;
-}
-
-.intent-star-core-note {
-  display: block;
-  margin-top: 0.2rem;
-  font-size: 0.62rem;
-  line-height: 1.35;
-  color: #a08060;
 }
 
 .intent-ray {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 142px;
+  width: 168px;
   height: 0;
   transform: rotate(var(--ray-angle));
   transform-origin: 0 0;
@@ -342,26 +273,26 @@
 
 .intent-ray-track {
   position: absolute;
-  left: 8px;
+  left: 12px;
   top: -10px;
-  width: 118px;
+  width: 136px;
 }
 
 .intent-ray-slider {
-  width: 118px;
+  width: 136px;
   margin: 0;
   accent-color: #c8952a;
 }
 
 .intent-vertex {
   position: absolute;
-  left: 136px;
+  left: 164px;
   top: 0;
   transform: translate(-50%, -50%);
 }
 
 .intent-vertex-card {
-  width: 118px;
+  width: 132px;
   border: 1px solid #3d2010;
   border-radius: 6px;
   background: rgba(14, 8, 4, 0.97);
@@ -482,12 +413,27 @@ button.faction-token-assigned {
 .faction-roster-item {
   width: 100%;
   display: grid;
-  grid-template-columns: 0.8rem 1rem minmax(0, 1fr);
+  grid-template-columns: 1.45rem minmax(0, 1fr);
   align-items: center;
   gap: 0.32rem;
   text-align: left;
   background: rgba(18, 10, 4, 0.78);
   border-color: #3d2010;
+}
+
+.faction-list-token {
+  width: 1.3rem;
+  height: 1.3rem;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  box-shadow: inset 0 0 0 1px rgba(10, 6, 3, 0.35);
+}
+
+.faction-list-token .faction-token-icon {
+  color: #140a04;
 }
 
 .faction-roster-item-active {
@@ -505,6 +451,20 @@ button.faction-token-assigned {
 .panel-section-fill {
   min-height: 0;
   overflow: auto;
+}
+
+.phase-faction-glyph {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.phase-faction-glyph-icon {
+  width: 100%;
+  height: 100%;
+  color: #140a04;
 }
 
 .control-actions {
@@ -587,16 +547,6 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 
-  .status-meta-row {
-    grid-template-columns: 1fr;
-    gap: 0.25rem;
-  }
-
-  .status-metrics-line {
-    justify-content: flex-start;
-    gap: 0.2rem 0.38rem;
-  }
-
   .hud-grid-compact {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -618,28 +568,28 @@ button:disabled {
   }
 
   .intent-star-board {
-    width: min(100%, 300px);
-    height: 280px;
+    width: min(100%, 320px);
+    height: 300px;
   }
 
   .intent-ray {
-    width: 132px;
+    width: 148px;
   }
 
   .intent-ray-track {
-    width: 106px;
+    width: 120px;
   }
 
   .intent-ray-slider {
-    width: 106px;
+    width: 120px;
   }
 
   .intent-vertex {
-    left: 126px;
+    left: 144px;
   }
 
   .intent-vertex-card {
-    width: 104px;
+    width: 114px;
     padding: 0.34rem;
   }
 

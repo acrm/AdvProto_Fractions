@@ -92,12 +92,6 @@ export function VectorStarControls({
   return (
     <div className="intent-star-shell">
       <div className="intent-star-board">
-        <div className="intent-star-core">
-          <span className="intent-star-core-title">Unit Vector</span>
-          <strong className="intent-star-core-value">||v|| = 1.00</strong>
-          <span className="intent-star-core-note">Drag faction tokens between vertices. Sliders redistribute projection along the five rays.</span>
-        </div>
-
         {ACTIVITY_VECTORS.map((vector) => {
           const currentValue = playerIntent.adjustments[vector]
           const effectiveValue = forecast.normalizedAdjustments[vector]

@@ -4,7 +4,6 @@ import { VectorStarControls } from './VectorStarControls'
 
 interface GameControlPanelProps {
   gameState: GameState
-  playerFaction: Faction
   selectedFaction: Faction
   playerIntent: PlayerIntent
   forecast: TurnForecast
@@ -24,7 +23,6 @@ function formatSigned(value: number): string {
 
 export function GameControlPanel({
   gameState,
-  playerFaction,
   selectedFaction,
   playerIntent,
   forecast,
@@ -64,15 +62,7 @@ export function GameControlPanel({
             <button className="ghost-button" onClick={onResetCampaign}>Reset Seed</button>
           </div>
         </div>
-        <div className="status-meta-row">
-          <p className="panel-note">{gameState.seasonState.briefing}</p>
-          <div className="status-metrics-line" aria-label="current metrics">
-            <span className="status-metric-item"><span className="status-metric-label">Score:</span> <strong>{playerFaction.score}</strong></span>
-            <span className="status-metric-item"><span className="status-metric-label">Resources:</span> <strong>{playerFaction.resourceStock}</strong></span>
-            <span className="status-metric-item"><span className="status-metric-label">Exposure:</span> <strong>{playerFaction.exposure}</strong></span>
-            <span className="status-metric-item"><span className="status-metric-label">Selected:</span> <strong>{selectedFaction.name}</strong></span>
-          </div>
-        </div>
+        <p className="panel-note">{gameState.seasonState.briefing}</p>
       </section>
 
       <section className="panel-row">
@@ -86,8 +76,9 @@ export function GameControlPanel({
                   className={`faction-roster-item ${selectedFaction.id === faction.id ? 'faction-roster-item-active' : ''}`}
                   onClick={() => onSelectFaction(faction.id)}
                 >
-                  <span className="faction-roster-color" style={{ background: factionColors[faction.id] }} />
-                  <FactionIcon name={faction.icon} />
+                  <span className="faction-list-token" style={{ background: factionColors[faction.id], borderColor: factionColors[faction.id] }}>
+                    <FactionIcon className="faction-token-icon" name={faction.icon} />
+                  </span>
                   <span>{faction.name}</span>
                 </button>
               </li>

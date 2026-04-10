@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { PointerEvent as ReactPointerEvent, WheelEvent as ReactWheelEvent } from 'react'
 import { ActivityVectorState, Faction } from '../../domain/gameModel'
+import { FactionIcon } from './FactionIcon'
 
 const DRAG_THRESHOLD_PX = 4
 const MIN_ZOOM = 0.2
@@ -66,18 +67,6 @@ function pointRadius(resourceStock: number, maxResource: number): number {
   const safeMax = Math.max(1, maxResource)
   const normalized = Math.log(resourceStock + 1) / Math.log(safeMax + 1)
   return 7 + normalized * 15
-}
-
-function factionSymbol(iconName: string): string {
-  const map: Record<string, string> = {
-    landmark: 'M',
-    fire: 'F',
-    coins: '$',
-    'drafting-compass': 'A',
-    shield: 'S',
-    lightbulb: 'L',
-  }
-  return map[iconName] ?? '*'
 }
 
 function trajectoryPoints(
@@ -147,6 +136,9 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
   const centerX = viewWidth / 2
   const centerY = viewHeight / 2
   const baseRadius = Math.min(viewWidth, viewHeight) * 0.34
+  const factionColorById = Object.fromEntries(
+    factions.map((faction, index) => [faction.id, faction.isPlayer ? '#c8a870' : COLORS[index % COLORS.length]]),
+  ) as Record<string, string>
 
   if (!playerFaction) {
     return (
@@ -304,9 +296,13 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
           -Covert / -Deterrence
         </text>
 
-        <circle cx={centerX} cy={centerY} r={10 / zoom} fill="#0e0804" stroke={selectedFactionId === playerFaction.id ? '#f0d898' : '#c8952a'} strokeWidth={2.5 / zoom} />
+        <circle cx={centerX} cy={centerY} r={10 / zoom} fill={factionColorById[playerFaction.id]} stroke={selectedFactionId === playerFaction.id ? '#f0d898' : '#c8952a'} strokeWidth={2.5 / zoom} />
         <circle cx={centerX} cy={centerY} r={18 / zoom} fill="none" stroke={selectedFactionId === playerFaction.id ? '#d4982a' : '#e8c870'} strokeWidth={3.2 / zoom} strokeOpacity={0.95} />
-        <text x={centerX} y={centerY + 4 / zoom} textAnchor="middle" fontSize={12 / zoom} fill="#f0d898">{factionSymbol(playerFaction.icon)}</text>
+        <foreignObject x={centerX - 7 / zoom} y={centerY - 7 / zoom} width={14 / zoom} height={14 / zoom} pointerEvents="none">
+          <div className="phase-faction-glyph">
+            <FactionIcon className="phase-faction-glyph-icon" name={playerFaction.icon} />
+          </div>
+        </foreignObject>
 
         {factions.map((faction, index) => (
           <g key={faction.id}>
@@ -340,15 +336,17 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
                         cx={point.x}
                         cy={point.y}
                         r={pointIndex === points.length - 1 ? rScaled : rTrail}
-                        fill={COLORS[index % COLORS.length]}
+                        fill={factionColorById[faction.id]}
                         fillOpacity={point.opacity}
                         stroke={highlight ? '#f0d898' : '#c8a870'}
                         strokeWidth={(pointIndex === points.length - 1 ? 2.3 : 1.2) / zoom}
                       />
                       {pointIndex === points.length - 1 ? (
-                        <text x={point.x} y={point.y + 4 / zoom} textAnchor="middle" fontSize={12 / zoom} fill="#140a04">
-                          {factionSymbol(faction.icon)}
-                        </text>
+                        <foreignObject x={point.x - 7 / zoom} y={point.y - 7 / zoom} width={14 / zoom} height={14 / zoom} pointerEvents="none">
+                          <div className="phase-faction-glyph">
+                            <FactionIcon className="phase-faction-glyph-icon" name={faction.icon} />
+                          </div>
+                        </foreignObject>
                       ) : null}
                     </g>
                   ))}

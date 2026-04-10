@@ -38,7 +38,6 @@ export function HomePage() {
 
       <GameControlPanel
         gameState={gameState}
-        playerFaction={playerFaction}
         selectedFaction={selectedFaction as Faction}
         playerIntent={playerIntent}
         forecast={forecast}
