@@ -14,7 +14,7 @@ interface PhaseSpaceChartProps {
   onSelectFaction: (factionId: string) => void
 }
 
-const COLORS = ['#005f73', '#ee9b00', '#9b2226', '#3a86ff', '#2a9d8f', '#6a4c93', '#ef476f']
+const COLORS = ['#b82030', '#c8922a', '#2a8c50', '#7040a8', '#cc7820', '#2870b8', '#a83060']
 const TRAJECTORY_TAIL = 5
 const MIN_VIEWPORT_WIDTH = 720
 const MIN_VIEWPORT_HEIGHT = 540
@@ -262,7 +262,7 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
           onPointerUp={handlePointerUp}
           onPointerLeave={handlePointerUp}
         >
-        <rect x={0} y={0} width={viewWidth} height={viewHeight} fill="#030712" rx={28} />
+        <rect x={0} y={0} width={viewWidth} height={viewHeight} fill="#0e0804" rx={0} />
         <g transform={`translate(${pan.x}, ${pan.y})`}>
         <g transform={`scale(${zoom})`}>
         {[0.25, 0.5, 0.75, 1].map((ratio) => (
@@ -272,30 +272,30 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
             cy={centerY}
             r={baseRadius * ratio}
             fill="none"
-            stroke="#183046"
+            stroke="#3a2310"
             strokeWidth={1 / zoom}
           />
         ))}
 
-        <line x1={centerX - baseRadius} y1={centerY} x2={centerX + baseRadius} y2={centerY} stroke="#26455f" strokeWidth={1.2 / zoom} />
-        <line x1={centerX} y1={centerY - baseRadius} x2={centerX} y2={centerY + baseRadius} stroke="#26455f" strokeWidth={1.2 / zoom} />
+        <line x1={centerX - baseRadius} y1={centerY} x2={centerX + baseRadius} y2={centerY} stroke="#4a3018" strokeWidth={1.2 / zoom} />
+        <line x1={centerX} y1={centerY - baseRadius} x2={centerX} y2={centerY + baseRadius} stroke="#4a3018" strokeWidth={1.2 / zoom} />
 
-        <text x={centerX + baseRadius + 18 / zoom} y={centerY + 5 / zoom} fontSize={15 / zoom} fill="#d0d8e6">
+        <text x={centerX + baseRadius + 18 / zoom} y={centerY + 5 / zoom} fontSize={15 / zoom} fill="#c8a870">
           +Economic / +Diplomatic
         </text>
-        <text x={centerX - baseRadius - 18 / zoom} y={centerY + 5 / zoom} textAnchor="end" fontSize={15 / zoom} fill="#d0d8e6">
+        <text x={centerX - baseRadius - 18 / zoom} y={centerY + 5 / zoom} textAnchor="end" fontSize={15 / zoom} fill="#c8a870">
           -Economic / -Diplomatic
         </text>
-        <text x={centerX + 2 / zoom} y={centerY - baseRadius - 18 / zoom} textAnchor="middle" fontSize={15 / zoom} fill="#d0d8e6">
+        <text x={centerX + 2 / zoom} y={centerY - baseRadius - 18 / zoom} textAnchor="middle" fontSize={15 / zoom} fill="#c8a870">
           +Covert / +Deterrence
         </text>
-        <text x={centerX + 2 / zoom} y={centerY + baseRadius + 24 / zoom} textAnchor="middle" fontSize={15 / zoom} fill="#d0d8e6">
+        <text x={centerX + 2 / zoom} y={centerY + baseRadius + 24 / zoom} textAnchor="middle" fontSize={15 / zoom} fill="#c8a870">
           -Covert / -Deterrence
         </text>
 
-        <circle cx={centerX} cy={centerY} r={10 / zoom} fill="#030712" stroke={selectedFactionId === playerFaction.id ? '#f8fafc' : '#60a5fa'} strokeWidth={2.5 / zoom} />
-        <circle cx={centerX} cy={centerY} r={18 / zoom} fill="none" stroke={selectedFactionId === playerFaction.id ? '#f59e0b' : '#22d3ee'} strokeWidth={3.2 / zoom} strokeOpacity={0.95} />
-        <text x={centerX + 28 / zoom} y={centerY - 22 / zoom} fontSize={15 / zoom} fill="#f8fafc">Player</text>
+        <circle cx={centerX} cy={centerY} r={10 / zoom} fill="#0e0804" stroke={selectedFactionId === playerFaction.id ? '#f0d898' : '#c8952a'} strokeWidth={2.5 / zoom} />
+        <circle cx={centerX} cy={centerY} r={18 / zoom} fill="none" stroke={selectedFactionId === playerFaction.id ? '#d4982a' : '#e8c870'} strokeWidth={3.2 / zoom} strokeOpacity={0.95} />
+        <text x={centerX + 28 / zoom} y={centerY - 22 / zoom} fontSize={15 / zoom} fill="#f0d898">Player</text>
 
         {factions.map((faction, index) => (
           <g key={faction.id}>
@@ -331,7 +331,7 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
                       r={pointIndex === points.length - 1 ? rScaled : rTrail}
                       fill={COLORS[index % COLORS.length]}
                       fillOpacity={point.opacity}
-                      stroke={highlight ? '#f8fafc' : '#dbeafe'}
+                      stroke={highlight ? '#f0d898' : '#c8a870'}
                       strokeWidth={(pointIndex === points.length - 1 ? 2.3 : 1.2) / zoom}
                     />
                   ))}
@@ -342,10 +342,10 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
                         cy={currentPoint.y}
                         r={rScaled + 7 / zoom}
                         fill="none"
-                        stroke="#f59e0b"
+                        stroke="#d4982a"
                         strokeWidth={2.4 / zoom}
                       />
-                      <text x={currentPoint.x + rScaled + 12 / zoom} y={currentPoint.y - rScaled - 8 / zoom} fontSize={14 / zoom} fill="#f8fafc">
+                      <text x={currentPoint.x + rScaled + 12 / zoom} y={currentPoint.y - rScaled - 8 / zoom} fontSize={14 / zoom} fill="#f0d898">
                         {faction.name}
                       </text>
                     </>
@@ -363,7 +363,7 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
         {factions.map((faction, index) => (
           <li key={faction.id} className={selectedFactionId === faction.id ? 'legend-active' : ''}>
             <button type="button" className="legend-button" onClick={() => onSelectFaction(faction.id)}>
-              <span className="legend-chip" style={{ background: faction.isPlayer ? '#111827' : COLORS[index % COLORS.length] }} />
+              <span className="legend-chip" style={{ background: faction.isPlayer ? '#1a0e06' : COLORS[index % COLORS.length] }} />
               <FactionIcon className="legend-icon" name={faction.icon} />
               {faction.name} {faction.isPlayer ? '(origin)' : ''}
             </button>

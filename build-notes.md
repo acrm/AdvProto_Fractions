@@ -14,3 +14,4 @@
 - 2026w10-0.12 — Font Awesome faction icons, fixed zoom-to-cursor mapping, seeded target assignments, swap drag-drop, and star-shaped vector controls
 - 2026w10-0.13 — fix oversized Font Awesome icons in phase board UI
 - 2026w10-0.14 — fix zoom-to-cursor state race in handleWheel
+- 2026w10-0.15 — medieval fantasy visual theme, right panel min-25%, no edge padding

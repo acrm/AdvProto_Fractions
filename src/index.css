@@ -1,9 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap');
+
 :root {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'EB Garamond', Georgia, 'Times New Roman', serif;
   line-height: 1.5;
   font-weight: 400;
-  color: #12263a;
-  background-color: #f3f6fb;
+  color: #f0ddb8;
+  background-color: #0e0804;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -14,6 +16,6 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background: radial-gradient(circle at 10% 0%, #e8f1ff 0%, #f5f8fc 40%, #edf2f7 100%);
+  background: radial-gradient(circle at 30% 20%, #1e1208 0%, #100804 55%, #080502 100%);
   overflow: hidden;
 }
