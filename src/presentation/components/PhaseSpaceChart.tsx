@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { PointerEvent as ReactPointerEvent, WheelEvent as ReactWheelEvent } from 'react'
 import { ActivityVectorState, Faction } from '../../domain/gameModel'
+import { FactionIcon } from './FactionIcon'
 
 const DRAG_THRESHOLD_PX = 4
 const MIN_ZOOM = 0.2
@@ -20,6 +21,21 @@ const MIN_VIEWPORT_HEIGHT = 540
 
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value))
+}
+
+function mapClientPointToViewBox(
+  eventTarget: SVGSVGElement,
+  clientX: number,
+  clientY: number,
+  viewWidth: number,
+  viewHeight: number,
+): { x: number; y: number } {
+  const rect = eventTarget.getBoundingClientRect()
+
+  return {
+    x: ((clientX - rect.left) / rect.width) * viewWidth,
+    y: ((clientY - rect.top) / rect.height) * viewHeight,
+  }
 }
 
 function projectRelativePoint(
@@ -132,9 +148,7 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
 
   const handleWheel = (event: ReactWheelEvent<SVGSVGElement>) => {
     event.preventDefault()
-    const rect = event.currentTarget.getBoundingClientRect()
-    const pointerX = ((event.clientX - rect.left) / rect.width) * viewWidth
-    const pointerY = ((event.clientY - rect.top) / rect.height) * viewHeight
+    const pointer = mapClientPointToViewBox(event.currentTarget, event.clientX, event.clientY, viewWidth, viewHeight)
 
     setZoom((currentZoom) => {
       const nextZoom = clamp(
@@ -144,11 +158,11 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
       )
 
       setPan((currentPan) => {
-        const worldX = (pointerX - currentPan.x) / currentZoom
-        const worldY = (pointerY - currentPan.y) / currentZoom
+        const worldX = (pointer.x - currentPan.x) / currentZoom
+        const worldY = (pointer.y - currentPan.y) / currentZoom
         return {
-          x: pointerX - worldX * nextZoom,
-          y: pointerY - worldY * nextZoom,
+          x: pointer.x - worldX * nextZoom,
+          y: pointer.y - worldY * nextZoom,
         }
       })
 
@@ -157,9 +171,7 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
   }
 
   const selectFactionAtPointer = (event: ReactPointerEvent<SVGSVGElement>) => {
-    const rect = event.currentTarget.getBoundingClientRect()
-    const pointerX = ((event.clientX - rect.left) / rect.width) * viewWidth
-    const pointerY = ((event.clientY - rect.top) / rect.height) * viewHeight
+    const pointer = mapClientPointToViewBox(event.currentTarget, event.clientX, event.clientY, viewWidth, viewHeight)
     const candidates: Array<{ id: string; x: number; y: number; hitRadius: number }> = []
 
     candidates.push({
@@ -188,8 +200,8 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
     let bestDistance = Number.POSITIVE_INFINITY
 
     candidates.forEach((candidate) => {
-      const dx = pointerX - candidate.x
-      const dy = pointerY - candidate.y
+      const dx = pointer.x - candidate.x
+      const dy = pointer.y - candidate.y
       const distance = Math.sqrt(dx * dx + dy * dy)
       if (distance <= candidate.hitRadius && distance < bestDistance) {
         bestDistance = distance
@@ -220,9 +232,10 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
     if (!dragMovedRef.current && Math.sqrt(dx * dx + dy * dy) > DRAG_THRESHOLD_PX) {
       dragMovedRef.current = true
     }
-    const rect = event.currentTarget.getBoundingClientRect()
-    const panDx = ((event.clientX - dragState.x) / rect.width) * viewWidth
-    const panDy = ((event.clientY - dragState.y) / rect.height) * viewHeight
+    const pointer = mapClientPointToViewBox(event.currentTarget, event.clientX, event.clientY, viewWidth, viewHeight)
+    const originPointer = mapClientPointToViewBox(event.currentTarget, dragState.x, dragState.y, viewWidth, viewHeight)
+    const panDx = pointer.x - originPointer.x
+    const panDy = pointer.y - originPointer.y
     setPan({
       x: dragState.originX + panDx,
       y: dragState.originY + panDy,
@@ -246,6 +259,7 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
           width="100%"
           height="100%"
           viewBox={`0 0 ${viewWidth} ${viewHeight}`}
+          preserveAspectRatio="none"
           role="img"
           aria-label="Faction activity phase space chart centered on player position"
           style={{ userSelect: 'none' }}
@@ -315,7 +329,6 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
                     fill="none"
                     stroke="transparent"
                     strokeWidth={28 / zoom}
-                    onClick={() => { if (!dragMovedRef.current) onSelectFaction(faction.id) }}
                   />
                   {points.map((point, pointIndex) => (
                     <circle
@@ -327,7 +340,6 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
                       fillOpacity={point.opacity}
                       stroke={highlight ? '#f8fafc' : '#dbeafe'}
                       strokeWidth={(pointIndex === points.length - 1 ? 2.3 : 1.2) / zoom}
-                      onClick={() => { if (!dragMovedRef.current) onSelectFaction(faction.id) }}
                     />
                   ))}
                   {highlight ? (
@@ -359,7 +371,7 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
           <li key={faction.id} className={selectedFactionId === faction.id ? 'legend-active' : ''}>
             <button type="button" className="legend-button" onClick={() => onSelectFaction(faction.id)}>
               <span className="legend-chip" style={{ background: faction.isPlayer ? '#111827' : COLORS[index % COLORS.length] }} />
-              <span className="legend-icon">{faction.icon}</span>
+              <FactionIcon className="legend-icon" name={faction.icon} />
               {faction.name} {faction.isPlayer ? '(origin)' : ''}
             </button>
           </li>

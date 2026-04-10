@@ -1,5 +1,6 @@
-import type { DragEvent } from 'react'
-import { ACTIVITY_VECTORS, ActivityVectorName, Faction, GameState, PlayerIntent, SessionOutcome, TurnForecast } from '../../domain/gameModel'
+import { ActivityVectorName, Faction, GameState, PlayerIntent, SessionOutcome, TurnForecast } from '../../domain/gameModel'
+import { FactionIcon } from './FactionIcon'
+import { VectorStarControls } from './VectorStarControls'
 
 interface GameControlPanelProps {
   gameState: GameState
@@ -14,22 +15,6 @@ interface GameControlPanelProps {
   onRunSession: () => void
   onNewCampaign: () => void
   onResetCampaign: () => void
-}
-
-const VECTOR_LABELS: Record<ActivityVectorName, string> = {
-  territorialPressure: 'Territorial Pressure',
-  diplomaticMomentum: 'Diplomatic Momentum',
-  economicThroughput: 'Economic Throughput',
-  covertTempo: 'Covert Tempo',
-  deterrencePosture: 'Deterrence Posture',
-}
-
-const VECTOR_HINTS: Record<ActivityVectorName, string> = {
-  territorialPressure: 'Physical expansion and control of routes and positions.',
-  diplomaticMomentum: 'Political leverage, negotiations, and legitimacy.',
-  economicThroughput: 'Supply, extraction, transport, and resource flow.',
-  covertTempo: 'Speed and intensity of deniable covert operations.',
-  deterrencePosture: 'Hard-power readiness and intimidation pressure.',
 }
 
 function formatSigned(value: number): string {
@@ -53,26 +38,6 @@ export function GameControlPanel({
   const selectedObjectives = gameState.seasonState.objectives.filter((objective) => objective.factionId === selectedFaction.id)
   const recentIntel = gameState.seasonState.intel.slice(-4)
   const recentLogs = gameState.seasonState.logs.slice(-4)
-  const nonPlayerFactions = gameState.factions.filter((faction) => !faction.isPlayer)
-  const assignedTargets = new Set(Object.values(playerIntent.targets).filter((target): target is string => Boolean(target)))
-
-  const handleDragStart = (event: DragEvent<HTMLButtonElement>, factionId: string) => {
-    event.dataTransfer.setData('text/plain', factionId)
-    event.dataTransfer.effectAllowed = 'move'
-  }
-
-  const handleDropTarget = (event: DragEvent<HTMLDivElement>, vector: ActivityVectorName) => {
-    event.preventDefault()
-    const factionId = event.dataTransfer.getData('text/plain')
-    if (factionId) {
-      onSetIntentTarget(vector, factionId)
-    }
-  }
-
-  const handleDragOverTarget = (event: DragEvent<HTMLDivElement>) => {
-    event.preventDefault()
-    event.dataTransfer.dropEffect = 'move'
-  }
 
   return (
     <aside className="game-side-panel">
@@ -114,88 +79,13 @@ export function GameControlPanel({
           <button className="ghost-button" onClick={onResetIntent}>Reset Plan</button>
         </div>
 
-        <div className="intent-list">
-          <div className="intent-pool">
-            <span className="intent-pool-label">Unassigned faction tokens</span>
-            <div className="intent-pool-tokens">
-              {nonPlayerFactions
-                .filter((faction) => !assignedTargets.has(faction.id))
-                .map((faction) => (
-                  <button
-                    type="button"
-                    key={faction.id}
-                    className="faction-token"
-                    draggable
-                    onDragStart={(event) => handleDragStart(event, faction.id)}
-                    title="Drag token to a vector row"
-                  >
-                    <span className="faction-token-icon">{faction.icon}</span>
-                    <span>{faction.name}</span>
-                  </button>
-                ))}
-            </div>
-          </div>
-          {ACTIVITY_VECTORS.map((vector) => {
-            const current = playerIntent.adjustments[vector]
-            const normed = forecast.normalizedAdjustments[vector]
-            const effective = formatSigned(normed)
-            const currentTarget = playerIntent.targets[vector] ?? ''
-            const targetFaction = nonPlayerFactions.find((faction) => faction.id === currentTarget)
-            const availableForVector = nonPlayerFactions.filter(
-              (faction) => !assignedTargets.has(faction.id) || faction.id === currentTarget,
-            )
-            return (
-              <div className="intent-row" key={vector}>
-                <div className="intent-row-top">
-                  <span className="intent-label" title={VECTOR_HINTS[vector]}>{VECTOR_LABELS[vector]}</span>
-                  <span className="intent-value">{formatSigned(current)}</span>
-                  <span className="intent-projection">→ {effective}</span>
-                </div>
-                <div className="intent-row-bottom">
-                  <div
-                    className="intent-target-slot"
-                    onDragOver={handleDragOverTarget}
-                    onDrop={(event) => handleDropTarget(event, vector)}
-                  >
-                    {targetFaction ? (
-                      <button
-                        type="button"
-                        className="faction-token faction-token-assigned"
-                        draggable
-                        onDragStart={(event) => handleDragStart(event, targetFaction.id)}
-                        onClick={() => onSetIntentTarget(vector, '')}
-                        title="Drag to another vector or click to clear"
-                      >
-                        <span className="faction-token-icon">{targetFaction.icon}</span>
-                        <span>{targetFaction.name}</span>
-                      </button>
-                    ) : (
-                      <span className="intent-target-hint">Drop target</span>
-                    )}
-                  </div>
-                  <select
-                    className="intent-target-select"
-                    value={currentTarget}
-                    onChange={(event) => onSetIntentTarget(vector, event.target.value)}
-                  >
-                    <option value="">no target</option>
-                    {availableForVector.map((faction) => (
-                      <option key={faction.id} value={faction.id}>{faction.name}</option>
-                    ))}
-                  </select>
-                  <input
-                    type="range"
-                    min={-1}
-                    max={1}
-                    step={0.01}
-                    value={current}
-                    onChange={(event) => onSetIntentValue(vector, Number(event.target.value))}
-                  />
-                </div>
-              </div>
-            )
-          })}
-        </div>
+        <VectorStarControls
+          factions={gameState.factions}
+          playerIntent={playerIntent}
+          forecast={forecast}
+          onSetIntentValue={onSetIntentValue}
+          onSetIntentTarget={onSetIntentTarget}
+        />
 
         <div className="forecast-grid">
           <div>
@@ -230,7 +120,7 @@ export function GameControlPanel({
 
       <section className="panel-section">
         <p className="eyebrow">Faction Focus</p>
-        <h3>{selectedFaction.icon} {selectedFaction.name}</h3>
+        <h3 className="faction-heading"><FactionIcon name={selectedFaction.icon} /> {selectedFaction.name}</h3>
         <p className="panel-note">{selectedFaction.profile.doctrine}</p>
         <p className="panel-note">Led by {selectedFaction.profile.leaderName} from {selectedFaction.profile.homeBase}.</p>
         <p className="panel-note">Current agenda: {selectedFaction.profile.agenda}</p>

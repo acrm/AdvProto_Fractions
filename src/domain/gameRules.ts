@@ -1,4 +1,6 @@
 import {
+  ACTIVITY_VECTORS,
+  ActivityVectorName,
   ActivityVectorState,
   CompatibilityClass,
   Faction,
@@ -159,6 +161,35 @@ function scaleIntentAdjustments(adj: ActivityVectorState): ActivityVectorState {
   }
 }
 
+function shuffleWithSeed<T>(items: T[], seed: number): T[] {
+  const rng = createSeededRandom(seed)
+  const result = [...items]
+
+  for (let index = result.length - 1; index > 0; index -= 1) {
+    const swapIndex = rng.nextInt(0, index)
+    ;[result[index], result[swapIndex]] = [result[swapIndex], result[index]]
+  }
+
+  return result
+}
+
+export function createSeededTargetAssignments(
+  seed: number,
+  factionIds: string[],
+): Partial<Record<ActivityVectorName, string>> {
+  const assigned: Partial<Record<ActivityVectorName, string>> = {}
+  const shuffled = shuffleWithSeed(factionIds, seed + 223)
+
+  ACTIVITY_VECTORS.forEach((vector, index) => {
+    const factionId = shuffled[index]
+    if (factionId) {
+      assigned[vector] = factionId
+    }
+  })
+
+  return assigned
+}
+
 export function normalizeIntentAdjustments(adj: ActivityVectorState, fallbackSeed: number): ActivityVectorState {
   const magnitude = vectorMagnitude(adj)
   if (magnitude <= UNIT_VECTOR_EPS) {
@@ -174,10 +205,10 @@ export function normalizeIntentAdjustments(adj: ActivityVectorState, fallbackSee
   }
 }
 
-export function createEmptyPlayerIntent(seed: number): PlayerIntent {
+export function createEmptyPlayerIntent(seed: number, targetFactionIds: string[] = []): PlayerIntent {
   return {
     adjustments: createRandomUnitVector(seed),
-    targets: {},
+    targets: createSeededTargetAssignments(seed, targetFactionIds),
   }
 }
 
@@ -583,7 +614,10 @@ export function runSession(state: GameState, strategy: PlayerStrategy, playerInt
   }
 
   const season = state.seasonState
-  const effectiveIntent = playerIntent ?? createEmptyPlayerIntent(state.seed + season.seasonNumber * 100 + season.sessionIndex)
+  const effectiveIntent = playerIntent ?? createEmptyPlayerIntent(
+    state.seed + season.seasonNumber * 100 + season.sessionIndex,
+    state.factions.filter((faction) => !faction.isPlayer).map((faction) => faction.id),
+  )
   const seasonSeed = state.seed + season.seasonNumber * 1000 + season.sessionIndex * 57
 
   // Normalize player intent before applying

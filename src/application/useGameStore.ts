@@ -37,9 +37,20 @@ function playerFactionId(state: GameState): string {
   return state.factions.find((faction) => faction.isPlayer)?.id ?? state.factions[0]?.id ?? 'unknown'
 }
 
+function intentSeed(state: GameState, offset = 0): number {
+  return state.seed + state.seasonState.seasonNumber * 100 + state.seasonState.sessionIndex + offset
+}
+
+function createIntentForState(state: GameState, offset = 0): PlayerIntent {
+  return createEmptyPlayerIntent(
+    intentSeed(state, offset),
+    state.factions.filter((faction) => !faction.isPlayer).map((faction) => faction.id),
+  )
+}
+
 const persisted = loadGameState()
 const initialState = persisted ?? createFreshState(DEFAULT_SEED)
-const initialIntent = createEmptyPlayerIntent(initialState.seed + initialState.seasonState.seasonNumber * 100 + initialState.seasonState.sessionIndex)
+const initialIntent = createIntentForState(initialState)
 
 export const useGameStore = create<GameStoreState>((set, get) => ({
   gameState: initialState,
@@ -50,7 +61,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   startCampaign: (seed) => {
     const nextState = createFreshState(seed ?? DEFAULT_SEED)
     saveGameState(nextState)
-    const nextIntent = createEmptyPlayerIntent(nextState.seed + nextState.seasonState.seasonNumber * 100 + nextState.seasonState.sessionIndex)
+    const nextIntent = createIntentForState(nextState)
     set({
       gameState: nextState,
       selectedFactionId: playerFactionId(nextState),
@@ -69,7 +80,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     }
     const normalizedAdjustments = normalizeIntentAdjustments(
       rawAdjustments,
-      state.seed + state.seasonState.seasonNumber * 100 + state.seasonState.sessionIndex,
+      intentSeed(state),
     )
     const nextIntent: PlayerIntent = {
       ...currentIntent,
@@ -105,7 +116,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   },
   resetIntent: () => {
     const state = get().gameState
-    const nextIntent = createEmptyPlayerIntent(state.seed + state.seasonState.seasonNumber * 100 + state.seasonState.sessionIndex + 17)
+    const nextIntent = createIntentForState(state, 17)
     set({ playerIntent: nextIntent, forecast: forecastPlayerTurn(get().gameState, nextIntent) })
   },
   playNextSession: () => {
@@ -114,9 +125,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     const strategy = deriveStrategyFromIntent(playerIntent)
     const result = runSession(current, strategy, playerIntent)
     saveGameState(result.nextState)
-    const nextIntent = createEmptyPlayerIntent(
-      result.nextState.seed + result.nextState.seasonState.seasonNumber * 100 + result.nextState.seasonState.sessionIndex,
-    )
+    const nextIntent = createIntentForState(result.nextState)
     set({
       gameState: result.nextState,
       selectedFactionId: get().selectedFactionId,
@@ -128,7 +137,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   resetCampaign: () => {
     const nextState = createFreshState(DEFAULT_SEED)
     saveGameState(nextState)
-    const nextIntent = createEmptyPlayerIntent(nextState.seed + nextState.seasonState.seasonNumber * 100 + nextState.seasonState.sessionIndex)
+    const nextIntent = createIntentForState(nextState)
     set({
       gameState: nextState,
       selectedFactionId: playerFactionId(nextState),

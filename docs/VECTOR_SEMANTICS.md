@@ -36,6 +36,9 @@ The simulation keeps its internal five-vector model, but the UI and narrative sh
 - The player intent vector is always normalized to unit length ($||v||_2 = 1$).
 - Zero vector is disallowed: when all components collapse, the system re-seeds a random unit vector.
 - Editing one component redistributes total vector length across the other components; you are reallocating one fixed tactical budget in direction space.
+- Each new planning state starts with a seeded random assignment of faction targets to the five vector components.
+- Reassigning targets by drag-and-drop swaps occupants when a token is dropped onto an already occupied component.
+- The command interface presents the five component sliders as a star: each ray is one component, and each vertex holds the faction token assigned to that influence channel.
 
 Preferred approach:
 - Keep these as mechanical keys in code.

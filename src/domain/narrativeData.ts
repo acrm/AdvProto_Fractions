@@ -69,7 +69,7 @@ export const NARRATIVE_CONTACTS: NarrativeContact[] = [
 export const FACTION_SEEDS: NarrativeFactionSeed[] = [
   {
     name: 'North Gate Compact',
-    icon: 'C',
+    icon: 'landmark',
     profile: {
       sphere: 'political',
       leaderName: 'Magistrate Elira Voss',
@@ -81,7 +81,7 @@ export const FACTION_SEEDS: NarrativeFactionSeed[] = [
   },
   {
     name: 'Ember Reliquary',
-    icon: 'R',
+    icon: 'fire',
     profile: {
       sphere: 'religious',
       leaderName: 'Prelate Amon Kest',
@@ -93,7 +93,7 @@ export const FACTION_SEEDS: NarrativeFactionSeed[] = [
   },
   {
     name: 'Gilded Ledger Exchange',
-    icon: '$',
+    icon: 'coins',
     profile: {
       sphere: 'economic',
       leaderName: 'Silas Rook',
@@ -105,7 +105,7 @@ export const FACTION_SEEDS: NarrativeFactionSeed[] = [
   },
   {
     name: 'Argent Survey Collegium',
-    icon: 'S',
+    icon: 'drafting-compass',
     profile: {
       sphere: 'scientific',
       leaderName: 'Professor Talandra Mire',
@@ -117,7 +117,7 @@ export const FACTION_SEEDS: NarrativeFactionSeed[] = [
   },
   {
     name: 'Iron Banner Companies',
-    icon: 'M',
+    icon: 'shield',
     profile: {
       sphere: 'military',
       leaderName: 'Marshal Corven Draik',
@@ -129,7 +129,7 @@ export const FACTION_SEEDS: NarrativeFactionSeed[] = [
   },
   {
     name: 'Grey Lantern Guild',
-    icon: 'G',
+    icon: 'lightbulb',
     profile: {
       sphere: 'guild',
       leaderName: 'Mara Flint',

@@ -1,6 +1,7 @@
 # Factions
 
 ## North Gate Compact
+- Interface Icon: Font Awesome landmark
 - Sphere: Political
 - Leader: Magistrate Elira Voss
 - Base: North Gate Council Quarter
@@ -9,6 +10,7 @@
 - Strategic Goal: Convert the frontier into governable colonial territory.
 
 ## Ember Reliquary
+- Interface Icon: Font Awesome fire-flame-curved
 - Sphere: Religious
 - Leader: Prelate Amon Kest
 - Base: Pilgrim Wells
@@ -17,6 +19,7 @@
 - Strategic Goal: Bind the under-country to sacred authority.
 
 ## Gilded Ledger Exchange
+- Interface Icon: Font Awesome coins
 - Sphere: Economic
 - Leader: Silas Rook
 - Base: The Gate Market
@@ -25,6 +28,7 @@
 - Strategic Goal: Own the trade and extraction arteries of the frontier.
 
 ## Argent Survey Collegium
+- Interface Icon: Font Awesome compass-drafting
 - Sphere: Scientific
 - Leader: Professor Talandra Mire
 - Base: The Hollow Archive Annex
@@ -33,6 +37,7 @@
 - Strategic Goal: Monopolize useful knowledge of the under-country.
 
 ## Iron Banner Companies
+- Interface Icon: Font Awesome shield-halved
 - Sphere: Military
 - Leader: Marshal Corven Draik
 - Base: The Switchback Frontier
@@ -41,6 +46,7 @@
 - Strategic Goal: Make the frontier safe enough to conquer and dangerous enough to stay necessary.
 
 ## Grey Lantern Guild
+- Interface Icon: Font Awesome lightbulb
 - Sphere: Independent guild / player faction
 - Leader: Mara Flint
 - Base: Grey Lantern Hall in North Gate

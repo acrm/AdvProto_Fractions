@@ -56,9 +56,12 @@ Clean/DDD layers:
 - Full single-screen tactical interface.
 - Diagram plus side panel are constrained to the full viewport without page scrolling.
 - Player-centered interactive phase board with cursor-centered zoom, pan, and faction selection.
+- Deep cursor-centered zoom with corrected pointer-space mapping for dense cluster inspection.
 - Non-player factions start with distinct initial phase offsets around the player origin.
 - Resource-scaled faction dots with trajectory tails.
-- Direct player control through five-vector movement intent and deterministic forecast.
+- Direct player control through a star-shaped five-vector command interface with deterministic forecast.
+- Font Awesome faction icons across legend, faction cards, and target tokens.
+- Seeded random initial target assignment across the five vector components, with drag-and-drop swap behavior between occupied vertices.
 - Seasonal doctrine concept documented as an advisory recommendation layer.
 - Explicit player override authority for doctrine divergence and tactical pivots.
 - Intel and deception signals designed to justify mid-season recommendation changes.

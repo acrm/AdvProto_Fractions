@@ -1,7 +1,7 @@
 {
   "name": "advproto-fractions",
   "private": true,
-  "version": "2026w10-0.11",
+  "version": "2026w10-0.12",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -15,6 +15,9 @@
     "bump:minor:staged": "node scripts/update-version.js --minor --commit-staged-only"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^7.2.0",
+    "@fortawesome/free-solid-svg-icons": "^7.2.0",
+    "@fortawesome/react-fontawesome": "^3.3.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "zustand": "^5.0.0"
