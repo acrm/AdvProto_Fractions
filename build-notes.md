@@ -16,3 +16,4 @@
 - 2026w10-0.14 — fix zoom-to-cursor state race in handleWheel
 - 2026w10-0.15 — medieval fantasy visual theme, right panel min-25%, no edge padding
 - 2026w10-0.16 — panel re-layout 50-50 with top controls, vector tokens, roster and faction focus
+- 2026w10-0.17 — tighten panel layout blocks and preserve top/vector/list/focus hierarchy

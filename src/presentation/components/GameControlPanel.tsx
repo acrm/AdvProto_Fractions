@@ -102,30 +102,6 @@ export function GameControlPanel({
           onSetIntentValue={onSetIntentValue}
           onSetIntentTarget={onSetIntentTarget}
         />
-
-        <div className="forecast-grid">
-          <div>
-            <span className="hud-label">Derived Stance</span>
-            <strong>{forecast.derivedStrategy}</strong>
-          </div>
-          <div>
-            <span className="hud-label">Resource Delta</span>
-            <strong>{formatSigned(forecast.resourceDelta)}</strong>
-          </div>
-          <div>
-            <span className="hud-label">Exposure Delta</span>
-            <strong>{formatSigned(forecast.exposureDelta)}</strong>
-          </div>
-          <div>
-            <span className="hud-label">Score Pressure</span>
-            <strong>{formatSigned(forecast.scorePressure)}</strong>
-          </div>
-        </div>
-
-        <p className="panel-note">
-          Intent vector is always unit length. You redistribute one fixed direction budget across five components.
-        </p>
-        {lastOutcome ? <p className="outcome-line">{lastOutcome.summary}</p> : null}
       </section>
 
       <section className="panel-section">
@@ -153,6 +129,31 @@ export function GameControlPanel({
         <p className="panel-note">{selectedFaction.profile.doctrine}</p>
         <p className="panel-note">Led by {selectedFaction.profile.leaderName} from {selectedFaction.profile.homeBase}.</p>
         <p className="panel-note">Current agenda: {selectedFaction.profile.agenda}</p>
+
+        <div className="forecast-grid">
+          <div>
+            <span className="hud-label">Derived Stance</span>
+            <strong>{forecast.derivedStrategy}</strong>
+          </div>
+          <div>
+            <span className="hud-label">Resource Delta</span>
+            <strong>{formatSigned(forecast.resourceDelta)}</strong>
+          </div>
+          <div>
+            <span className="hud-label">Exposure Delta</span>
+            <strong>{formatSigned(forecast.exposureDelta)}</strong>
+          </div>
+          <div>
+            <span className="hud-label">Score Pressure</span>
+            <strong>{formatSigned(forecast.scorePressure)}</strong>
+          </div>
+        </div>
+
+        <p className="panel-note">
+          Intent vector is always unit length. You redistribute one fixed direction budget across five components.
+        </p>
+        {lastOutcome ? <p className="outcome-line">{lastOutcome.summary}</p> : null}
+
         <div className="detail-grid">
           <div>
             <span className="hud-label">Power Base</span>
