@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { PointerEvent as ReactPointerEvent, WheelEvent as ReactWheelEvent } from 'react'
 import { ActivityVectorState, Faction } from '../../domain/gameModel'
-import { FactionIcon } from './FactionIcon'
 
 const DRAG_THRESHOLD_PX = 4
 const MIN_ZOOM = 0.2
@@ -67,6 +66,18 @@ function pointRadius(resourceStock: number, maxResource: number): number {
   const safeMax = Math.max(1, maxResource)
   const normalized = Math.log(resourceStock + 1) / Math.log(safeMax + 1)
   return 7 + normalized * 15
+}
+
+function factionSymbol(iconName: string): string {
+  const map: Record<string, string> = {
+    landmark: 'M',
+    fire: 'F',
+    coins: '$',
+    'drafting-compass': 'A',
+    shield: 'S',
+    lightbulb: 'L',
+  }
+  return map[iconName] ?? '*'
 }
 
 function trajectoryPoints(
@@ -295,7 +306,7 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
 
         <circle cx={centerX} cy={centerY} r={10 / zoom} fill="#0e0804" stroke={selectedFactionId === playerFaction.id ? '#f0d898' : '#c8952a'} strokeWidth={2.5 / zoom} />
         <circle cx={centerX} cy={centerY} r={18 / zoom} fill="none" stroke={selectedFactionId === playerFaction.id ? '#d4982a' : '#e8c870'} strokeWidth={3.2 / zoom} strokeOpacity={0.95} />
-        <text x={centerX + 28 / zoom} y={centerY - 22 / zoom} fontSize={15 / zoom} fill="#f0d898">Player</text>
+        <text x={centerX} y={centerY + 4 / zoom} textAnchor="middle" fontSize={12 / zoom} fill="#f0d898">{factionSymbol(playerFaction.icon)}</text>
 
         {factions.map((faction, index) => (
           <g key={faction.id}>
@@ -324,16 +335,22 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
                     strokeWidth={28 / zoom}
                   />
                   {points.map((point, pointIndex) => (
-                    <circle
-                      key={`${faction.id}-trail-${pointIndex}`}
-                      cx={point.x}
-                      cy={point.y}
-                      r={pointIndex === points.length - 1 ? rScaled : rTrail}
-                      fill={COLORS[index % COLORS.length]}
-                      fillOpacity={point.opacity}
-                      stroke={highlight ? '#f0d898' : '#c8a870'}
-                      strokeWidth={(pointIndex === points.length - 1 ? 2.3 : 1.2) / zoom}
-                    />
+                    <g key={`${faction.id}-trail-${pointIndex}`}>
+                      <circle
+                        cx={point.x}
+                        cy={point.y}
+                        r={pointIndex === points.length - 1 ? rScaled : rTrail}
+                        fill={COLORS[index % COLORS.length]}
+                        fillOpacity={point.opacity}
+                        stroke={highlight ? '#f0d898' : '#c8a870'}
+                        strokeWidth={(pointIndex === points.length - 1 ? 2.3 : 1.2) / zoom}
+                      />
+                      {pointIndex === points.length - 1 ? (
+                        <text x={point.x} y={point.y + 4 / zoom} textAnchor="middle" fontSize={12 / zoom} fill="#140a04">
+                          {factionSymbol(faction.icon)}
+                        </text>
+                      ) : null}
+                    </g>
                   ))}
                   {highlight ? (
                     <>
@@ -359,17 +376,6 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
         </g>
         </svg>
       </div>
-      <ul className="legend-list">
-        {factions.map((faction, index) => (
-          <li key={faction.id} className={selectedFactionId === faction.id ? 'legend-active' : ''}>
-            <button type="button" className="legend-button" onClick={() => onSelectFaction(faction.id)}>
-              <span className="legend-chip" style={{ background: faction.isPlayer ? '#1a0e06' : COLORS[index % COLORS.length] }} />
-              <FactionIcon className="legend-icon" name={faction.icon} />
-              {faction.name} {faction.isPlayer ? '(origin)' : ''}
-            </button>
-          </li>
-        ))}
-      </ul>
     </div>
   )
 }

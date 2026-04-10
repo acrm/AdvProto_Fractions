@@ -122,29 +122,29 @@
 
 .game-side-panel {
   display: grid;
-  gap: 0.55rem;
-  padding: 0.65rem;
+  gap: 0.45rem;
+  padding: 0.5rem;
   overflow: hidden;
   min-height: 0;
   align-content: start;
-  grid-template-rows: auto auto auto auto minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr);
 }
 
 .panel-section {
   border: 1px solid #3d2010;
   border-radius: 6px;
-  padding: 0.65rem;
+  padding: 0.48rem;
   background: rgba(18, 10, 4, 0.88);
 }
 
 .panel-section-status {
-  padding: 0.45rem 0.65rem;
+  padding: 0.42rem 0.52rem;
 }
 
 .campaign-status-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(320px, 1.25fr);
-  gap: 0.55rem;
+  gap: 0.4rem;
   align-items: start;
 }
 
@@ -156,24 +156,9 @@
   margin: 0.1rem 0 0;
 }
 
-.panel-section-header {
-  display: grid;
-  gap: 0.35rem;
-}
-
 .hud-grid-compact {
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.45rem;
-}
-
-.game-side-panel > .panel-section:nth-child(3) {
-  max-height: 44dvh;
-  overflow: auto;
-}
-
-.game-side-panel > .panel-section:nth-child(4) {
-  max-height: 19dvh;
-  overflow: auto;
+  gap: 0.3rem;
 }
 
 .hud-grid,
@@ -217,16 +202,30 @@
   margin-top: 0;
 }
 
+.panel-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: 0.45rem;
+  min-height: 0;
+}
+
+.panel-section-list,
+.panel-section-command {
+  min-height: 0;
+  overflow: auto;
+  max-height: 44dvh;
+}
+
 .vector-section-layout {
   display: grid;
   grid-template-columns: minmax(220px, 0.95fr) minmax(0, 1.15fr);
-  gap: 0.55rem;
+  gap: 0.4rem;
   align-items: start;
 }
 
 .vector-section-summary {
   display: grid;
-  gap: 0.45rem;
+  gap: 0.3rem;
 }
 
 .vector-section-summary .forecast-grid {
@@ -250,14 +249,14 @@
 
 .intent-star-shell {
   display: grid;
-  gap: 0.45rem;
+  gap: 0.3rem;
 }
 
 .intent-star-board {
   position: relative;
-  width: min(100%, 320px);
-  height: 300px;
-  min-height: 300px;
+  width: min(100%, 280px);
+  height: 260px;
+  min-height: 260px;
   margin: 0 auto;
 }
 
@@ -265,20 +264,20 @@
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 112px;
+  width: 92px;
   transform: translate(-50%, -50%);
   border: 1px solid #5c3a14;
   border-radius: 8px;
   background: radial-gradient(circle at 50% 30%, rgba(35, 20, 8, 0.97), rgba(14, 8, 4, 0.99));
   color: #f0d8a0;
-  padding: 0.7rem;
+  padding: 0.45rem;
   text-align: center;
   box-shadow: 0 0 0 1px rgba(200, 149, 42, 0.12), inset 0 0 16px rgba(200, 149, 42, 0.04);
 }
 
 .intent-star-core-title {
   display: block;
-  font-size: 0.6rem;
+  font-size: 0.52rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: #806040;
@@ -287,14 +286,14 @@
 
 .intent-star-core-value {
   display: block;
-  margin-top: 0.3rem;
+  margin-top: 0.2rem;
   color: #f2e0bb;
 }
 
 .intent-star-core-note {
   display: block;
-  margin-top: 0.35rem;
-  font-size: 0.72rem;
+  margin-top: 0.2rem;
+  font-size: 0.62rem;
   line-height: 1.35;
   color: #a08060;
 }
@@ -445,7 +444,7 @@ button.faction-token-assigned {
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 0.28rem;
+  gap: 0.2rem;
 }
 
 .faction-roster-item {
@@ -453,7 +452,7 @@ button.faction-token-assigned {
   display: grid;
   grid-template-columns: 0.8rem 1rem minmax(0, 1fr);
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.32rem;
   text-align: left;
   background: rgba(18, 10, 4, 0.78);
   border-color: #3d2010;
@@ -479,8 +478,8 @@ button.faction-token-assigned {
 .control-actions {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 0.45rem;
-  margin-top: 0.45rem;
+  gap: 0.35rem;
+  margin-top: 0.2rem;
 }
 
 button {
@@ -488,11 +487,11 @@ button {
   color: #f2e0bb;
   border: 1px solid #8b3010;
   border-radius: 5px;
-  padding: 0.55rem 0.65rem;
+  padding: 0.42rem 0.5rem;
   font-weight: 600;
   cursor: pointer;
   font-family: 'Cinzel', Georgia, serif;
-  font-size: 0.72rem;
+  font-size: 0.64rem;
   letter-spacing: 0.04em;
   transition: border-color 0.15s, background 0.15s;
 }
@@ -549,6 +548,7 @@ button:disabled {
   .game-side-panel {
     min-height: 0;
     overflow: auto;
+    grid-template-rows: auto auto auto;
   }
 
   .campaign-status-grid {
@@ -560,6 +560,10 @@ button:disabled {
   }
 
   .control-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .panel-row {
     grid-template-columns: 1fr;
   }
 

@@ -64,9 +64,6 @@ export function GameControlPanel({
             <button className="ghost-button" onClick={onResetCampaign}>Reset Seed</button>
           </div>
         </div>
-      </section>
-
-      <section className="panel-section panel-section-header">
         <p className="panel-note">{gameState.seasonState.briefing}</p>
         <div className="hud-grid hud-grid-compact">
           <div>
@@ -88,69 +85,69 @@ export function GameControlPanel({
         </div>
       </section>
 
-      <section className="panel-section">
-        <div className="vector-section-layout">
-          <div className="vector-section-summary">
-            <div className="section-heading-row">
-              <div>
-                <p className="eyebrow">Command Vector</p>
-                <h3>Next Iteration Plan</h3>
-              </div>
-              <button className="ghost-button" onClick={onResetIntent}>Reset Plan</button>
-            </div>
-
-            <div className="forecast-grid">
-              <div>
-                <span className="hud-label">Derived Stance</span>
-                <strong>{forecast.derivedStrategy}</strong>
-              </div>
-              <div>
-                <span className="hud-label">Resource Delta</span>
-                <strong>{formatSigned(forecast.resourceDelta)}</strong>
-              </div>
-              <div>
-                <span className="hud-label">Exposure Delta</span>
-                <strong>{formatSigned(forecast.exposureDelta)}</strong>
-              </div>
-              <div>
-                <span className="hud-label">Score Pressure</span>
-                <strong>{formatSigned(forecast.scorePressure)}</strong>
-              </div>
-            </div>
-
-            <p className="panel-note">
-              Intent vector is always unit length. You redistribute one fixed direction budget across five components.
-            </p>
-            {lastOutcome ? <p className="outcome-line">{lastOutcome.summary}</p> : null}
-          </div>
-          <VectorStarControls
-            factions={gameState.factions}
-            factionColors={factionColors}
-            playerIntent={playerIntent}
-            forecast={forecast}
-            onSetIntentValue={onSetIntentValue}
-            onSetIntentTarget={onSetIntentTarget}
-          />
+      <section className="panel-row">
+        <div className="panel-section panel-section-list">
+          <p className="eyebrow">Faction List</p>
+          <ul className="faction-roster-list">
+            {gameState.factions.map((faction) => (
+              <li key={faction.id}>
+                <button
+                  type="button"
+                  className={`faction-roster-item ${selectedFaction.id === faction.id ? 'faction-roster-item-active' : ''}`}
+                  onClick={() => onSelectFaction(faction.id)}
+                >
+                  <span className="faction-roster-color" style={{ background: factionColors[faction.id] }} />
+                  <FactionIcon name={faction.icon} />
+                  <span>{faction.name}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
         </div>
-      </section>
 
-      <section className="panel-section">
-        <p className="eyebrow">Faction List</p>
-        <ul className="faction-roster-list">
-          {gameState.factions.map((faction) => (
-            <li key={faction.id}>
-              <button
-                type="button"
-                className={`faction-roster-item ${selectedFaction.id === faction.id ? 'faction-roster-item-active' : ''}`}
-                onClick={() => onSelectFaction(faction.id)}
-              >
-                <span className="faction-roster-color" style={{ background: factionColors[faction.id] }} />
-                <FactionIcon name={faction.icon} />
-                <span>{faction.name}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
+        <div className="panel-section panel-section-command">
+          <div className="vector-section-layout">
+            <div className="vector-section-summary">
+              <div className="section-heading-row">
+                <div>
+                  <p className="eyebrow">Command Vector</p>
+                  <h3>Next Iteration Plan</h3>
+                </div>
+                <button className="ghost-button" onClick={onResetIntent}>Reset Plan</button>
+              </div>
+
+              <div className="forecast-grid">
+                <div>
+                  <span className="hud-label">Derived Stance</span>
+                  <strong>{forecast.derivedStrategy}</strong>
+                </div>
+                <div>
+                  <span className="hud-label">Resource Delta</span>
+                  <strong>{formatSigned(forecast.resourceDelta)}</strong>
+                </div>
+                <div>
+                  <span className="hud-label">Exposure Delta</span>
+                  <strong>{formatSigned(forecast.exposureDelta)}</strong>
+                </div>
+                <div>
+                  <span className="hud-label">Score Pressure</span>
+                  <strong>{formatSigned(forecast.scorePressure)}</strong>
+                </div>
+              </div>
+
+              {lastOutcome ? <p className="outcome-line">{lastOutcome.summary}</p> : null}
+            </div>
+
+            <VectorStarControls
+              factions={gameState.factions}
+              factionColors={factionColors}
+              playerIntent={playerIntent}
+              forecast={forecast}
+              onSetIntentValue={onSetIntentValue}
+              onSetIntentTarget={onSetIntentTarget}
+            />
+          </div>
+        </div>
       </section>
 
       <section className="panel-section panel-section-fill">
