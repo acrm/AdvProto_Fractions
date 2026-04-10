@@ -20,3 +20,4 @@
 - 2026w10-0.18 — split campaign status into compact header block
 - 2026w10-0.19 — densify panel packing and move blocks per layout arrows
 - 2026w10-0.20 — pack status block, row-align faction list with command vector, remove chart legend
+- 2026w10-0.21 — compress status metrics into single inline row with briefing

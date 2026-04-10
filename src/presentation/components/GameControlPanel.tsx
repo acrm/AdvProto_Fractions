@@ -64,23 +64,13 @@ export function GameControlPanel({
             <button className="ghost-button" onClick={onResetCampaign}>Reset Seed</button>
           </div>
         </div>
-        <p className="panel-note">{gameState.seasonState.briefing}</p>
-        <div className="hud-grid hud-grid-compact">
-          <div>
-            <span className="hud-label">Score</span>
-            <strong>{playerFaction.score}</strong>
-          </div>
-          <div>
-            <span className="hud-label">Resources</span>
-            <strong>{playerFaction.resourceStock}</strong>
-          </div>
-          <div>
-            <span className="hud-label">Exposure</span>
-            <strong>{playerFaction.exposure}</strong>
-          </div>
-          <div>
-            <span className="hud-label">Selected</span>
-            <strong>{selectedFaction.name}</strong>
+        <div className="status-meta-row">
+          <p className="panel-note">{gameState.seasonState.briefing}</p>
+          <div className="status-metrics-line" aria-label="current metrics">
+            <span className="status-metric-item"><span className="status-metric-label">Score:</span> <strong>{playerFaction.score}</strong></span>
+            <span className="status-metric-item"><span className="status-metric-label">Resources:</span> <strong>{playerFaction.resourceStock}</strong></span>
+            <span className="status-metric-item"><span className="status-metric-label">Exposure:</span> <strong>{playerFaction.exposure}</strong></span>
+            <span className="status-metric-item"><span className="status-metric-label">Selected:</span> <strong>{selectedFaction.name}</strong></span>
           </div>
         </div>
       </section>

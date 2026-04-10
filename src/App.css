@@ -32,6 +32,7 @@
 .panel-note,
 .outcome-line {
   color: #a08060;
+  margin: 0;
 }
 
 .phase-board,
@@ -159,6 +160,37 @@
 .hud-grid-compact {
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.3rem;
+}
+
+.status-meta-row {
+  margin-top: 0.2rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.status-metrics-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.22rem 0.48rem;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.status-metric-item {
+  font-size: 0.66rem;
+  color: #f2e0bb;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.status-metric-label {
+  color: #8e6a3e;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 0.56rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .hud-grid,
@@ -553,6 +585,16 @@ button:disabled {
 
   .campaign-status-grid {
     grid-template-columns: 1fr;
+  }
+
+  .status-meta-row {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+
+  .status-metrics-line {
+    justify-content: flex-start;
+    gap: 0.2rem 0.38rem;
   }
 
   .hud-grid-compact {
