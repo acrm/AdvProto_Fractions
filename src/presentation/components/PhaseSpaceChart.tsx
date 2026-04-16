@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import type { PointerEvent as ReactPointerEvent, WheelEvent as ReactWheelEvent } from 'react'
+import type { PointerEvent as ReactPointerEvent } from 'react'
 import { ActivityVectorState, Faction } from '../../domain/gameModel'
 import { FactionIcon } from './FactionIcon'
 
@@ -104,6 +104,7 @@ function trajectoryPoints(
 
 export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }: PhaseSpaceChartProps) {
   const canvasRef = useRef<HTMLDivElement | null>(null)
+  const svgRef = useRef<SVGSVGElement | null>(null)
   const dragMovedRef = useRef(false)
   const dragStartRef = useRef({ x: 0, y: 0 })
   const [zoom, setZoom] = useState(1)
@@ -131,6 +132,46 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
     return () => resizeObserver.disconnect()
   }, [])
 
+  useEffect(() => {
+    const element = svgRef.current
+    if (!element) return
+
+    const handleNativeWheel = (event: WheelEvent) => {
+      event.preventDefault()
+
+      const pointer = mapClientPointToViewBox(
+        element,
+        event.clientX,
+        event.clientY,
+        viewport.width,
+        viewport.height,
+      )
+
+      setZoom((currentZoom) => {
+        const nextZoom = clamp(
+          event.deltaY > 0 ? currentZoom / ZOOM_FACTOR : currentZoom * ZOOM_FACTOR,
+          MIN_ZOOM,
+          MAX_ZOOM,
+        )
+
+        setPan((currentPan) => {
+          const worldX = (pointer.x - currentPan.x) / currentZoom
+          const worldY = (pointer.y - currentPan.y) / currentZoom
+
+          return {
+            x: pointer.x - worldX * nextZoom,
+            y: pointer.y - worldY * nextZoom,
+          }
+        })
+
+        return nextZoom
+      })
+    }
+
+    element.addEventListener('wheel', handleNativeWheel, { passive: false })
+    return () => element.removeEventListener('wheel', handleNativeWheel)
+  }, [viewport.height, viewport.width])
+
   const viewWidth = viewport.width
   const viewHeight = viewport.height
   const centerX = viewWidth / 2
@@ -147,23 +188,6 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
         <p>Player faction is missing. Unable to render player-centered projection.</p>
       </div>
     )
-  }
-
-  const handleWheel = (event: ReactWheelEvent<SVGSVGElement>) => {
-    event.preventDefault()
-    const pointer = mapClientPointToViewBox(event.currentTarget, event.clientX, event.clientY, viewWidth, viewHeight)
-    const nextZoom = clamp(
-      event.deltaY > 0 ? zoom / ZOOM_FACTOR : zoom * ZOOM_FACTOR,
-      MIN_ZOOM,
-      MAX_ZOOM,
-    )
-    const worldX = (pointer.x - pan.x) / zoom
-    const worldY = (pointer.y - pan.y) / zoom
-    setZoom(nextZoom)
-    setPan({
-      x: pointer.x - worldX * nextZoom,
-      y: pointer.y - worldY * nextZoom,
-    })
   }
 
   const selectFactionAtPointer = (event: ReactPointerEvent<SVGSVGElement>) => {
@@ -252,6 +276,7 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
     <div className="phase-board">
       <div className="phase-canvas" ref={canvasRef}>
         <svg
+          ref={svgRef}
           width="100%"
           height="100%"
           viewBox={`0 0 ${viewWidth} ${viewHeight}`}
@@ -259,7 +284,6 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
           role="img"
           aria-label="Faction activity phase space chart centered on player position"
           style={{ userSelect: 'none' }}
-          onWheel={handleWheel}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
