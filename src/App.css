@@ -106,7 +106,7 @@
 
 .game-planning-panel-content {
   display: grid;
-  gap: 0.4rem;
+  gap: 0;
 }
 
 .game-side-panel-content {
@@ -249,14 +249,6 @@
   font-family: 'Cinzel', Georgia, serif;
 }
 
-.section-heading-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: start;
-  gap: 0.45rem;
-  margin-bottom: 0.35rem;
-}
-
 .control-actions-header {
   margin-top: 0.25rem;
 }
@@ -275,18 +267,8 @@
 .vector-section-layout {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 0.4rem;
-  align-items: start;
-}
-
-.vector-section-summary {
-  display: grid;
-  gap: 0.3rem;
-}
-
-.vector-section-summary .forecast-grid {
-  grid-template-columns: 1fr;
-  gap: 0.38rem;
+  gap: 0;
+  align-items: stretch;
 }
 
 .intent-pool-label {
@@ -305,22 +287,35 @@
 
 .intent-star-shell {
   display: grid;
-  gap: 0.3rem;
+  gap: 0.45rem;
+}
+
+.intent-star-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 .intent-star-board {
   position: relative;
-  width: min(100%, 400px);
-  height: 380px;
-  min-height: 380px;
+  width: min(100%, 560px);
+  height: 460px;
+  min-height: 460px;
   margin: 0 auto;
+}
+
+.intent-reset-button {
+  position: absolute;
+  top: 0.2rem;
+  right: 0.2rem;
+  z-index: 8;
 }
 
 .intent-ray {
   position: absolute;
   left: 50%;
-  top: 50%;
-  width: 186px;
+  top: calc(50% + 10px);
+  width: 220px;
   height: 0;
   transform: rotate(var(--ray-angle));
   transform-origin: 0 0;
@@ -328,8 +323,8 @@
 
 .intent-ray-label {
   position: absolute;
-  left: 14px;
-  top: -26px;
+  left: 18px;
+  top: -30px;
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
@@ -344,14 +339,14 @@
 
 .intent-ray-track {
   position: absolute;
-  left: 12px;
+  left: 18px;
   top: -10px;
-  width: 150px;
+  width: 170px;
   z-index: 5;
 }
 
 .intent-ray-slider {
-  width: 150px;
+  width: 170px;
   margin: 0;
   accent-color: #c8952a;
   position: relative;
@@ -360,13 +355,23 @@
 
 .intent-ray-end {
   position: absolute;
-  left: 176px;
+  left: 214px;
   top: 0;
   transform: translate(-50%, -50%) rotate(calc(-1 * var(--ray-angle)));
   display: grid;
   justify-items: center;
-  gap: 0.08rem;
+  gap: 0.24rem;
   z-index: 3;
+}
+
+.intent-ray-stats {
+  display: grid;
+  justify-items: center;
+  gap: 0.1rem;
+  padding: 0.14rem 0.28rem;
+  border-radius: 999px;
+  background: rgba(16, 10, 4, 0.82);
+  box-shadow: 0 0 0 1px rgba(61, 32, 16, 0.75);
 }
 
 .intent-ray-value,
@@ -433,7 +438,8 @@ button.faction-token-dot .faction-token-icon {
 }
 
 button.faction-token-assigned {
-  width: 1.7rem;
+  width: 1.9rem;
+  height: 1.9rem;
   margin: 0 auto;
 }
 
@@ -693,10 +699,6 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 
-  .vector-section-summary .forecast-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .fit-scale-panel {
     place-items: stretch;
   }
@@ -715,29 +717,36 @@ button:disabled {
   }
 
   .intent-star-board {
-    width: min(100%, 320px);
-    height: 312px;
+    width: min(100%, 360px);
+    height: 360px;
   }
 
   .intent-ray {
-    width: 154px;
+    top: calc(50% + 8px);
+    width: 172px;
   }
 
   .intent-ray-label {
-    top: -24px;
+    top: -22px;
+    left: 14px;
     font-size: 0.6rem;
   }
 
   .intent-ray-track {
-    width: 124px;
+    left: 14px;
+    width: 134px;
   }
 
   .intent-ray-slider {
-    width: 124px;
+    width: 134px;
   }
 
   .intent-ray-end {
-    left: 148px;
+    left: 168px;
+  }
+
+  .intent-ray-stats {
+    padding: 0.1rem 0.22rem;
   }
 
   button.faction-token {

@@ -1,4 +1,4 @@
-import { ActivityVectorName, Faction, PlayerIntent, SessionOutcome, TurnForecast } from '../../domain/gameModel'
+import { ActivityVectorName, Faction, PlayerIntent, TurnForecast } from '../../domain/gameModel'
 import { FitScalePanel } from './FitScalePanel'
 import { VectorStarControls } from './VectorStarControls'
 
@@ -6,7 +6,6 @@ interface CommandPlanningPanelProps {
   factions: Faction[]
   playerIntent: PlayerIntent
   forecast: TurnForecast
-  lastOutcome: SessionOutcome | null
   onSetIntentValue: (vector: ActivityVectorName, value: number) => void
   onSetIntentTarget: (vector: ActivityVectorName, factionId: string) => void
   onResetIntent: () => void
@@ -14,15 +13,10 @@ interface CommandPlanningPanelProps {
 
 const FACTION_PALETTE = ['#b82030', '#c8922a', '#2a8c50', '#7040a8', '#cc7820', '#2870b8', '#a83060']
 
-function formatSigned(value: number): string {
-  return `${value >= 0 ? '+' : ''}${value.toFixed(2)}`
-}
-
 export function CommandPlanningPanel({
   factions,
   playerIntent,
   forecast,
-  lastOutcome,
   onSetIntentValue,
   onSetIntentTarget,
   onResetIntent,
@@ -33,39 +27,8 @@ export function CommandPlanningPanel({
 
   return (
     <section className="game-planning-panel">
-      <FitScalePanel baseWidth={520}>
+      <FitScalePanel baseWidth={600}>
         <div className="game-planning-panel-content vector-section-layout">
-          <div className="vector-section-summary">
-            <div className="section-heading-row">
-              <div>
-                <p className="eyebrow">Command Vector</p>
-                <h3>Next Iteration Plan</h3>
-              </div>
-              <button className="ghost-button" onClick={onResetIntent}>Reset Plan</button>
-            </div>
-
-            <div className="forecast-grid">
-              <div>
-                <span className="hud-label">Derived Stance</span>
-                <strong>{forecast.derivedStrategy}</strong>
-              </div>
-              <div>
-                <span className="hud-label">Resource Delta</span>
-                <strong>{formatSigned(forecast.resourceDelta)}</strong>
-              </div>
-              <div>
-                <span className="hud-label">Exposure Delta</span>
-                <strong>{formatSigned(forecast.exposureDelta)}</strong>
-              </div>
-              <div>
-                <span className="hud-label">Score Pressure</span>
-                <strong>{formatSigned(forecast.scorePressure)}</strong>
-              </div>
-            </div>
-
-            {lastOutcome ? <p className="outcome-line">{lastOutcome.summary}</p> : null}
-          </div>
-
           <VectorStarControls
             factions={factions}
             factionColors={factionColors}
@@ -73,6 +36,7 @@ export function CommandPlanningPanel({
             forecast={forecast}
             onSetIntentValue={onSetIntentValue}
             onSetIntentTarget={onSetIntentTarget}
+            onResetIntent={onResetIntent}
           />
         </div>
       </FitScalePanel>

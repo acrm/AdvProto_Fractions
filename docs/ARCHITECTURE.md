@@ -43,7 +43,8 @@ infrastructure ← application (via interfaces)
 ### Presentation
 - `src/presentation/pages/HomePage.tsx` hosts the game shell.
 - `src/presentation/components/PhaseSpaceChart.tsx` renders the interactive player-centered phase board.
-- `src/presentation/components/GameControlPanel.tsx` hosts summary, detail, controls, and forecast UI.
+- `src/presentation/components/CommandPlanningPanel.tsx` hosts the star-shaped command planning UI.
+- `src/presentation/components/GameControlPanel.tsx` hosts campaign summary, faction detail, and intel UI.
 - `src/presentation/components/SeasonStatusPanel.tsx` exposes current campaign status.
 
 ## Session Pipeline

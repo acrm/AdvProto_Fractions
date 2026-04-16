@@ -33,7 +33,6 @@ export function HomePage() {
     selectedFactionId,
     playerIntent,
     forecast,
-    lastOutcome,
     selectFaction,
     setIntentValue,
     setIntentTarget,
@@ -168,7 +167,6 @@ export function HomePage() {
           factions={gameState.factions}
           playerIntent={playerIntent}
           forecast={forecast}
-          lastOutcome={lastOutcome}
           onSetIntentValue={setIntentValue}
           onSetIntentTarget={setIntentTarget}
           onResetIntent={resetIntent}

@@ -34,6 +34,7 @@ interface VectorStarControlsProps {
   factionColors: Record<string, string>
   onSetIntentValue: (vector: ActivityVectorName, value: number) => void
   onSetIntentTarget: (vector: ActivityVectorName, factionId: string) => void
+  onResetIntent: () => void
 }
 
 function formatSigned(value: number): string {
@@ -47,6 +48,7 @@ export function VectorStarControls({
   factionColors,
   onSetIntentValue,
   onSetIntentTarget,
+  onResetIntent,
 }: VectorStarControlsProps) {
   const nonPlayerFactions = factions.filter((faction) => !faction.isPlayer)
   const assignedIds = new Set(Object.values(playerIntent.targets).filter((target): target is string => Boolean(target)))
@@ -91,7 +93,13 @@ export function VectorStarControls({
 
   return (
     <div className="intent-star-shell">
+      <div className="intent-star-header">
+        <p className="eyebrow">Command Vector</p>
+      </div>
+
       <div className="intent-star-board">
+        <button className="ghost-button intent-reset-button" onClick={onResetIntent}>Reset Plan</button>
+
         {ACTIVITY_VECTORS.map((vector) => {
           const currentValue = playerIntent.adjustments[vector]
           const effectiveValue = forecast.normalizedAdjustments[vector]
@@ -119,8 +127,10 @@ export function VectorStarControls({
               </div>
 
               <div className="intent-ray-end" onDragOver={handleDragOver} onDrop={(event) => handleDrop(event, vector)}>
-                <span className="intent-ray-value">{formatSigned(currentValue)}</span>
-                <span className="intent-ray-effective">→ {formatSigned(effectiveValue)}</span>
+                <div className="intent-ray-stats">
+                  <span className="intent-ray-value">{formatSigned(currentValue)}</span>
+                  <span className="intent-ray-effective">→ {formatSigned(effectiveValue)}</span>
+                </div>
                 {targetFaction ? (
                   <button
                     type="button"

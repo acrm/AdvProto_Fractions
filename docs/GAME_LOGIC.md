@@ -68,7 +68,7 @@ All factions are represented in a phase-space with vectors in range -100 to 100:
 - When a panel is resized, its content should keep its proportions and scale down to remain fully visible within the assigned area instead of relying on internal scrolling.
 - It should foreground faction doctrine, home base, leadership, and current agenda alongside raw metrics.
 - The player can set signed intent values for each of the 5 vectors before resolving the next session.
-- A deterministic forecast shows projected player vectors, resource delta, exposure delta, and score pressure.
+- Each vector ray shows deterministic effective intent values directly beside its target token.
 
 ## Anti-Exploit Rules
 - Repeated sabotage raises exposure and retaliation risk.

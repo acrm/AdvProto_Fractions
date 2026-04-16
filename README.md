@@ -61,7 +61,7 @@ Clean/DDD layers:
 - Deep cursor-centered zoom with corrected pointer-space mapping for dense cluster inspection.
 - Non-player factions start with distinct initial phase offsets around the player origin.
 - Resource-scaled faction dots with trajectory tails.
-- Direct player control through a star-shaped five-vector command interface with deterministic forecast.
+- Direct player control through a star-shaped five-vector command interface with per-ray deterministic forecast values.
 - Font Awesome faction icons across legend, faction cards, and target tokens.
 - Seeded random initial target assignment across the five vector components, with drag-and-drop swap behavior between occupied vertices.
 - Seasonal doctrine concept documented as an advisory recommendation layer.
