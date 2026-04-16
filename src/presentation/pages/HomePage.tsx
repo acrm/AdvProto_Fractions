@@ -1,5 +1,6 @@
 import { useGameStore } from '../../application/useGameStore'
 import { Faction } from '../../domain/gameModel'
+import { CommandPlanningPanel } from '../components/CommandPlanningPanel'
 import { GameControlPanel } from '../components/GameControlPanel'
 import { PhaseSpaceChart } from '../components/PhaseSpaceChart'
 
@@ -28,24 +29,30 @@ export function HomePage() {
 
   return (
     <main className="game-screen">
-      <section className="game-board-column">
-        <PhaseSpaceChart
+      <section className="game-tactical-column">
+        <section className="game-board-column">
+          <PhaseSpaceChart
+            factions={gameState.factions}
+            selectedFactionId={selectedFaction.id}
+            onSelectFaction={selectFaction}
+          />
+        </section>
+
+        <CommandPlanningPanel
           factions={gameState.factions}
-          selectedFactionId={selectedFaction.id}
-          onSelectFaction={selectFaction}
+          playerIntent={playerIntent}
+          forecast={forecast}
+          lastOutcome={lastOutcome}
+          onSetIntentValue={setIntentValue}
+          onSetIntentTarget={setIntentTarget}
+          onResetIntent={resetIntent}
         />
       </section>
 
       <GameControlPanel
         gameState={gameState}
         selectedFaction={selectedFaction as Faction}
-        playerIntent={playerIntent}
-        forecast={forecast}
-        lastOutcome={lastOutcome}
         onSelectFaction={selectFaction}
-        onSetIntentValue={setIntentValue}
-        onSetIntentTarget={setIntentTarget}
-        onResetIntent={resetIntent}
         onRunSession={playNextSession}
         onNewCampaign={() => startCampaign(Date.now())}
         onResetCampaign={resetCampaign}

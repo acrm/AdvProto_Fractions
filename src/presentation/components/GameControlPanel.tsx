@@ -1,36 +1,19 @@
-import { ActivityVectorName, Faction, GameState, PlayerIntent, SessionOutcome, TurnForecast } from '../../domain/gameModel'
+import { Faction, GameState } from '../../domain/gameModel'
 import { FactionIcon } from './FactionIcon'
-import { VectorStarControls } from './VectorStarControls'
 
 interface GameControlPanelProps {
   gameState: GameState
   selectedFaction: Faction
-  playerIntent: PlayerIntent
-  forecast: TurnForecast
-  lastOutcome: SessionOutcome | null
   onSelectFaction: (factionId: string) => void
-  onSetIntentValue: (vector: ActivityVectorName, value: number) => void
-  onSetIntentTarget: (vector: ActivityVectorName, factionId: string) => void
-  onResetIntent: () => void
   onRunSession: () => void
   onNewCampaign: () => void
   onResetCampaign: () => void
 }
 
-function formatSigned(value: number): string {
-  return `${value >= 0 ? '+' : ''}${value.toFixed(2)}`
-}
-
 export function GameControlPanel({
   gameState,
   selectedFaction,
-  playerIntent,
-  forecast,
-  lastOutcome,
   onSelectFaction,
-  onSetIntentValue,
-  onSetIntentTarget,
-  onResetIntent,
   onRunSession,
   onNewCampaign,
   onResetCampaign,
@@ -65,70 +48,24 @@ export function GameControlPanel({
         <p className="panel-note">{gameState.seasonState.briefing}</p>
       </section>
 
-      <section className="panel-row">
-        <div className="panel-section panel-section-list">
-          <p className="eyebrow">Faction List</p>
-          <ul className="faction-roster-list">
-            {gameState.factions.map((faction) => (
-              <li key={faction.id}>
-                <button
-                  type="button"
-                  className={`faction-roster-item ${selectedFaction.id === faction.id ? 'faction-roster-item-active' : ''}`}
-                  onClick={() => onSelectFaction(faction.id)}
-                >
-                  <span className="faction-list-token" style={{ background: factionColors[faction.id], borderColor: factionColors[faction.id] }}>
-                    <FactionIcon className="faction-token-icon" name={faction.icon} />
-                  </span>
-                  <span>{faction.name}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="panel-section panel-section-command">
-          <div className="vector-section-layout">
-            <div className="vector-section-summary">
-              <div className="section-heading-row">
-                <div>
-                  <p className="eyebrow">Command Vector</p>
-                  <h3>Next Iteration Plan</h3>
-                </div>
-                <button className="ghost-button" onClick={onResetIntent}>Reset Plan</button>
-              </div>
-
-              <div className="forecast-grid">
-                <div>
-                  <span className="hud-label">Derived Stance</span>
-                  <strong>{forecast.derivedStrategy}</strong>
-                </div>
-                <div>
-                  <span className="hud-label">Resource Delta</span>
-                  <strong>{formatSigned(forecast.resourceDelta)}</strong>
-                </div>
-                <div>
-                  <span className="hud-label">Exposure Delta</span>
-                  <strong>{formatSigned(forecast.exposureDelta)}</strong>
-                </div>
-                <div>
-                  <span className="hud-label">Score Pressure</span>
-                  <strong>{formatSigned(forecast.scorePressure)}</strong>
-                </div>
-              </div>
-
-              {lastOutcome ? <p className="outcome-line">{lastOutcome.summary}</p> : null}
-            </div>
-
-            <VectorStarControls
-              factions={gameState.factions}
-              factionColors={factionColors}
-              playerIntent={playerIntent}
-              forecast={forecast}
-              onSetIntentValue={onSetIntentValue}
-              onSetIntentTarget={onSetIntentTarget}
-            />
-          </div>
-        </div>
+      <section className="panel-section panel-section-list">
+        <p className="eyebrow">Faction List</p>
+        <ul className="faction-roster-list">
+          {gameState.factions.map((faction) => (
+            <li key={faction.id}>
+              <button
+                type="button"
+                className={`faction-roster-item ${selectedFaction.id === faction.id ? 'faction-roster-item-active' : ''}`}
+                onClick={() => onSelectFaction(faction.id)}
+              >
+                <span className="faction-list-token" style={{ background: factionColors[faction.id], borderColor: factionColors[faction.id] }}>
+                  <FactionIcon className="faction-token-icon" name={faction.icon} />
+                </span>
+                <span>{faction.name}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section className="panel-section panel-section-fill">
