@@ -62,8 +62,9 @@ All factions are represented in a phase-space with vectors in range -100 to 100:
 - The player faction uses a persistent distinctive outline even when another faction is selected.
 
 ## Command Panel Rules
-- The left tactical column is vertically split into the live phase chart and the command planning controls.
-- The right panel combines campaign summary, faction roster, selected faction detail, recent intel, and resolution feed.
+- The screen is organized into a top overview row and a bottom tactical row.
+- The top row contains campaign status on the left and the faction roster on the right.
+- The bottom row contains command planning on the left, the phase chart in the center, and faction focus with intel and resolution feed on the right.
 - Desktop dividers between the three panel zones are draggable.
 - When a panel is resized, its content should keep its proportions and scale down to remain fully visible within the assigned area instead of relying on internal scrolling.
 - It should foreground faction doctrine, home base, leadership, and current agenda alongside raw metrics.

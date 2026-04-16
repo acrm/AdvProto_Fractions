@@ -2,16 +2,19 @@ import { type KeyboardEvent, useEffect, useRef, useState } from 'react'
 import { useGameStore } from '../../application/useGameStore'
 import { Faction } from '../../domain/gameModel'
 import { CommandPlanningPanel } from '../components/CommandPlanningPanel'
-import { GameControlPanel } from '../components/GameControlPanel'
+import { CampaignStatusPanel, FactionFocusPanel, FactionRosterPanel } from '../components/GameControlPanel'
 import { PhaseSpaceChart } from '../components/PhaseSpaceChart'
 
 const DESKTOP_BREAKPOINT_PX = 1180
-const MIN_TACTICAL_WIDTH_PX = 520
-const MIN_SIDEBAR_WIDTH_PX = 360
-const MIN_CHART_HEIGHT_PX = 280
-const MIN_PLANNING_HEIGHT_PX = 240
+const MIN_TOP_ROW_HEIGHT_PX = 170
+const MIN_BOTTOM_ROW_HEIGHT_PX = 360
+const MIN_STATUS_WIDTH_PX = 430
+const MIN_ROSTER_WIDTH_PX = 300
+const MIN_PLANNING_WIDTH_PX = 360
+const MIN_CHART_WIDTH_PX = 520
+const MIN_FOCUS_WIDTH_PX = 360
 
-type DragTarget = 'screen' | 'tactical'
+type DragTarget = 'page-row' | 'top-row' | 'bottom-left' | 'bottom-right'
 
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value))
@@ -42,9 +45,12 @@ export function HomePage() {
     resetCampaign,
   } = useGameStore()
   const screenRef = useRef<HTMLElement | null>(null)
-  const tacticalRef = useRef<HTMLElement | null>(null)
-  const [screenSplit, setScreenSplit] = useState(0.6)
-  const [tacticalSplit, setTacticalSplit] = useState(0.62)
+  const topRowRef = useRef<HTMLElement | null>(null)
+  const bottomRowRef = useRef<HTMLElement | null>(null)
+  const [pageRowSplit, setPageRowSplit] = useState(0.3)
+  const [topRowSplit, setTopRowSplit] = useState(0.7)
+  const [bottomLeftSplit, setBottomLeftSplit] = useState(0.28)
+  const [bottomRightSplit, setBottomRightSplit] = useState(0.26)
   const [dragTarget, setDragTarget] = useState<DragTarget | null>(null)
 
   const playerFaction = gameState.factions.find((faction) => faction.isPlayer)
@@ -54,27 +60,45 @@ export function HomePage() {
     if (!dragTarget) return
 
     const handlePointerMove = (event: PointerEvent) => {
-      if (dragTarget === 'screen') {
+      if (dragTarget === 'page-row') {
         const rect = screenRef.current?.getBoundingClientRect()
         if (!rect) return
 
-        const next = (event.clientX - rect.left) / rect.width
-        setScreenSplit(clampSplit(next, rect.width, MIN_TACTICAL_WIDTH_PX, MIN_SIDEBAR_WIDTH_PX))
+        const next = (event.clientY - rect.top) / rect.height
+        setPageRowSplit(clampSplit(next, rect.height, MIN_TOP_ROW_HEIGHT_PX, MIN_BOTTOM_ROW_HEIGHT_PX))
         return
       }
 
-      const rect = tacticalRef.current?.getBoundingClientRect()
+      if (dragTarget === 'top-row') {
+        const rect = topRowRef.current?.getBoundingClientRect()
+        if (!rect) return
+
+        const next = (event.clientX - rect.left) / rect.width
+        setTopRowSplit(clampSplit(next, rect.width, MIN_STATUS_WIDTH_PX, MIN_ROSTER_WIDTH_PX))
+        return
+      }
+
+      const rect = bottomRowRef.current?.getBoundingClientRect()
       if (!rect) return
 
-      const next = (event.clientY - rect.top) / rect.height
-      setTacticalSplit(clampSplit(next, rect.height, MIN_CHART_HEIGHT_PX, MIN_PLANNING_HEIGHT_PX))
+      if (dragTarget === 'bottom-left') {
+        const next = (event.clientX - rect.left) / rect.width
+        setBottomLeftSplit(clampSplit(next, rect.width, MIN_PLANNING_WIDTH_PX, MIN_CHART_WIDTH_PX + MIN_FOCUS_WIDTH_PX))
+        return
+      }
+
+      const nextRight = (rect.right - event.clientX) / rect.width
+      setBottomRightSplit(clampSplit(nextRight, rect.width, MIN_FOCUS_WIDTH_PX, MIN_PLANNING_WIDTH_PX + MIN_CHART_WIDTH_PX))
     }
 
     const handlePointerUp = () => {
       setDragTarget(null)
     }
 
-    document.body.classList.add('panel-resizing', dragTarget === 'screen' ? 'panel-resizing-column' : 'panel-resizing-row')
+    document.body.classList.add(
+      'panel-resizing',
+      dragTarget === 'page-row' ? 'panel-resizing-row' : 'panel-resizing-column',
+    )
     window.addEventListener('pointermove', handlePointerMove)
     window.addEventListener('pointerup', handlePointerUp)
     window.addEventListener('pointercancel', handlePointerUp)
@@ -92,39 +116,75 @@ export function HomePage() {
     setDragTarget(target)
   }
 
-  const nudgeScreenSplit = (deltaPx: number) => {
+  const nudgePageRowSplit = (deltaPx: number) => {
     const rect = screenRef.current?.getBoundingClientRect()
     if (!rect) return
 
-    setScreenSplit((current) => clampSplit(current + deltaPx / rect.width, rect.width, MIN_TACTICAL_WIDTH_PX, MIN_SIDEBAR_WIDTH_PX))
+    setPageRowSplit((current) => clampSplit(current + deltaPx / rect.height, rect.height, MIN_TOP_ROW_HEIGHT_PX, MIN_BOTTOM_ROW_HEIGHT_PX))
   }
 
-  const nudgeTacticalSplit = (deltaPx: number) => {
-    const rect = tacticalRef.current?.getBoundingClientRect()
+  const nudgeTopRowSplit = (deltaPx: number) => {
+    const rect = topRowRef.current?.getBoundingClientRect()
     if (!rect) return
 
-    setTacticalSplit((current) => clampSplit(current + deltaPx / rect.height, rect.height, MIN_CHART_HEIGHT_PX, MIN_PLANNING_HEIGHT_PX))
+    setTopRowSplit((current) => clampSplit(current + deltaPx / rect.width, rect.width, MIN_STATUS_WIDTH_PX, MIN_ROSTER_WIDTH_PX))
   }
 
-  const handleScreenDividerKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'ArrowLeft') {
-      event.preventDefault()
-      nudgeScreenSplit(-24)
-    }
-    if (event.key === 'ArrowRight') {
-      event.preventDefault()
-      nudgeScreenSplit(24)
-    }
+  const nudgeBottomLeftSplit = (deltaPx: number) => {
+    const rect = bottomRowRef.current?.getBoundingClientRect()
+    if (!rect) return
+
+    setBottomLeftSplit((current) => clampSplit(current + deltaPx / rect.width, rect.width, MIN_PLANNING_WIDTH_PX, MIN_CHART_WIDTH_PX + MIN_FOCUS_WIDTH_PX))
   }
 
-  const handleTacticalDividerKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+  const nudgeBottomRightSplit = (deltaPx: number) => {
+    const rect = bottomRowRef.current?.getBoundingClientRect()
+    if (!rect) return
+
+    setBottomRightSplit((current) => clampSplit(current - deltaPx / rect.width, rect.width, MIN_FOCUS_WIDTH_PX, MIN_PLANNING_WIDTH_PX + MIN_CHART_WIDTH_PX))
+  }
+
+  const handlePageDividerKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'ArrowUp') {
       event.preventDefault()
-      nudgeTacticalSplit(-24)
+      nudgePageRowSplit(-24)
     }
     if (event.key === 'ArrowDown') {
       event.preventDefault()
-      nudgeTacticalSplit(24)
+      nudgePageRowSplit(24)
+    }
+  }
+
+  const handleTopDividerKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'ArrowLeft') {
+      event.preventDefault()
+      nudgeTopRowSplit(-24)
+    }
+    if (event.key === 'ArrowRight') {
+      event.preventDefault()
+      nudgeTopRowSplit(24)
+    }
+  }
+
+  const handleBottomLeftDividerKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'ArrowLeft') {
+      event.preventDefault()
+      nudgeBottomLeftSplit(-24)
+    }
+    if (event.key === 'ArrowRight') {
+      event.preventDefault()
+      nudgeBottomLeftSplit(24)
+    }
+  }
+
+  const handleBottomRightDividerKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'ArrowLeft') {
+      event.preventDefault()
+      nudgeBottomRightSplit(-24)
+    }
+    if (event.key === 'ArrowRight') {
+      event.preventDefault()
+      nudgeBottomRightSplit(24)
     }
   }
 
@@ -136,13 +196,81 @@ export function HomePage() {
     <main
       className="game-screen"
       ref={screenRef}
-      style={{ '--screen-left-size': `${(screenSplit * 100).toFixed(2)}%` } as React.CSSProperties}
+      style={{ '--page-top-size': `${(pageRowSplit * 100).toFixed(2)}%` } as React.CSSProperties}
     >
       <section
-        className="game-tactical-column"
-        ref={tacticalRef}
-        style={{ '--tactical-top-size': `${(tacticalSplit * 100).toFixed(2)}%` } as React.CSSProperties}
+        className="game-top-row"
+        ref={topRowRef}
+        style={{ '--top-left-size': `${(topRowSplit * 100).toFixed(2)}%` } as React.CSSProperties}
       >
+        <CampaignStatusPanel
+          gameState={gameState}
+          selectedFaction={selectedFaction as Faction}
+          onRunSession={playNextSession}
+          onNewCampaign={() => startCampaign(Date.now())}
+          onResetCampaign={resetCampaign}
+        />
+
+        <div
+          aria-label="Resize status and faction list panels"
+          aria-orientation="vertical"
+          className={`panel-divider panel-divider-vertical ${dragTarget === 'top-row' ? 'panel-divider-active' : ''}`}
+          onKeyDown={handleTopDividerKeyDown}
+          onPointerDown={() => startResize('top-row')}
+          role="separator"
+          tabIndex={0}
+        >
+          <span className="panel-divider-handle" />
+        </div>
+
+        <FactionRosterPanel
+          gameState={gameState}
+          selectedFaction={selectedFaction as Faction}
+          onSelectFaction={selectFaction}
+        />
+      </section>
+
+      <div
+        aria-label="Resize overview and tactical rows"
+        aria-orientation="horizontal"
+        className={`panel-divider panel-divider-horizontal ${dragTarget === 'page-row' ? 'panel-divider-active' : ''}`}
+        onKeyDown={handlePageDividerKeyDown}
+        onPointerDown={() => startResize('page-row')}
+        role="separator"
+        tabIndex={0}
+      >
+        <span className="panel-divider-handle" />
+      </div>
+
+      <section
+        className="game-bottom-row"
+        ref={bottomRowRef}
+        style={{
+          '--bottom-left-size': `${(bottomLeftSplit * 100).toFixed(2)}%`,
+          '--bottom-right-size': `${(bottomRightSplit * 100).toFixed(2)}%`,
+        } as React.CSSProperties}
+      >
+        <CommandPlanningPanel
+          factions={gameState.factions}
+          playerIntent={playerIntent}
+          forecast={forecast}
+          onSetIntentValue={setIntentValue}
+          onSetIntentTarget={setIntentTarget}
+          onResetIntent={resetIntent}
+        />
+
+        <div
+          aria-label="Resize command vector and phase chart panels"
+          aria-orientation="vertical"
+          className={`panel-divider panel-divider-vertical ${dragTarget === 'bottom-left' ? 'panel-divider-active' : ''}`}
+          onKeyDown={handleBottomLeftDividerKeyDown}
+          onPointerDown={() => startResize('bottom-left')}
+          role="separator"
+          tabIndex={0}
+        >
+          <span className="panel-divider-handle" />
+        </div>
+
         <section className="game-board-column">
           <PhaseSpaceChart
             factions={gameState.factions}
@@ -152,47 +280,22 @@ export function HomePage() {
         </section>
 
         <div
-          aria-label="Resize chart and planning panels"
-          aria-orientation="horizontal"
-          className={`panel-divider panel-divider-horizontal ${dragTarget === 'tactical' ? 'panel-divider-active' : ''}`}
-          onKeyDown={handleTacticalDividerKeyDown}
-          onPointerDown={() => startResize('tactical')}
+          aria-label="Resize phase chart and faction focus panels"
+          aria-orientation="vertical"
+          className={`panel-divider panel-divider-vertical ${dragTarget === 'bottom-right' ? 'panel-divider-active' : ''}`}
+          onKeyDown={handleBottomRightDividerKeyDown}
+          onPointerDown={() => startResize('bottom-right')}
           role="separator"
           tabIndex={0}
         >
           <span className="panel-divider-handle" />
         </div>
 
-        <CommandPlanningPanel
-          factions={gameState.factions}
-          playerIntent={playerIntent}
-          forecast={forecast}
-          onSetIntentValue={setIntentValue}
-          onSetIntentTarget={setIntentTarget}
-          onResetIntent={resetIntent}
+        <FactionFocusPanel
+          gameState={gameState}
+          selectedFaction={selectedFaction as Faction}
         />
       </section>
-
-      <div
-        aria-label="Resize tactical and intelligence panels"
-        aria-orientation="vertical"
-        className={`panel-divider panel-divider-vertical ${dragTarget === 'screen' ? 'panel-divider-active' : ''}`}
-        onKeyDown={handleScreenDividerKeyDown}
-        onPointerDown={() => startResize('screen')}
-        role="separator"
-        tabIndex={0}
-      >
-        <span className="panel-divider-handle" />
-      </div>
-
-      <GameControlPanel
-        gameState={gameState}
-        selectedFaction={selectedFaction as Faction}
-        onSelectFaction={selectFaction}
-        onRunSession={playNextSession}
-        onNewCampaign={() => startCampaign(Date.now())}
-        onResetCampaign={resetCampaign}
-      />
     </main>
   )
 }

@@ -11,10 +11,11 @@
 
 .game-screen {
   display: grid;
-  grid-template-columns:
-    minmax(0, var(--screen-left-size, 60%))
+  grid-template-columns: 1fr;
+  grid-template-rows:
+    minmax(0, var(--page-top-size, 30%))
     var(--panel-divider-size)
-    minmax(22rem, calc(100% - var(--screen-left-size, 60%) - var(--panel-divider-size)));
+    minmax(0, calc(100% - var(--page-top-size, 30%) - var(--panel-divider-size)));
   gap: 0;
   height: 100dvh;
   padding: 0;
@@ -22,12 +23,23 @@
   overflow: hidden;
 }
 
-.game-tactical-column {
+.game-top-row {
   display: grid;
-  grid-template-rows:
-    minmax(0, var(--tactical-top-size, 62%))
+  grid-template-columns:
+    minmax(0, var(--top-left-size, 70%))
     var(--panel-divider-size)
-    minmax(14rem, calc(100% - var(--tactical-top-size, 62%) - var(--panel-divider-size)));
+    minmax(18rem, calc(100% - var(--top-left-size, 70%) - var(--panel-divider-size)));
+  min-height: 0;
+}
+
+.game-bottom-row {
+  display: grid;
+  grid-template-columns:
+    minmax(0, var(--bottom-left-size, 28%))
+    var(--panel-divider-size)
+    minmax(0, calc(100% - var(--bottom-left-size, 28%) - var(--bottom-right-size, 26%) - (2 * var(--panel-divider-size))))
+    var(--panel-divider-size)
+    minmax(20rem, var(--bottom-right-size, 26%));
   min-height: 0;
 }
 
@@ -54,7 +66,7 @@
 
 .phase-board,
 .game-planning-panel,
-.game-side-panel {
+.dashboard-panel {
   border-radius: 0;
   background: linear-gradient(160deg, #1a1008 0%, #0e0804 100%);
   box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.5);
@@ -72,6 +84,14 @@
   display: grid;
   min-height: 0;
   padding: 0.75rem;
+  overflow: hidden;
+  align-content: stretch;
+}
+
+.dashboard-panel {
+  display: grid;
+  min-height: 0;
+  padding: 0.5rem;
   overflow: hidden;
   align-content: stretch;
 }
@@ -109,14 +129,37 @@
   gap: 0;
 }
 
+.dashboard-panel-content {
+  width: 100%;
+}
+
+.dashboard-status-content,
+.dashboard-roster-content,
+.dashboard-focus-content {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.dashboard-status-content {
+  align-content: start;
+}
+
+.dashboard-roster-content {
+  align-content: start;
+}
+
+.dashboard-focus-content {
+  align-content: start;
+}
+
 .game-side-panel-content {
   display: grid;
   gap: 0.45rem;
   grid-template-rows: auto auto minmax(0, 1fr);
 }
 
-.game-side-panel h2,
-.game-side-panel h3 {
+.dashboard-panel h2,
+.dashboard-panel h3 {
   margin: 0;
   color: #f2e0bb;
   font-family: 'Cinzel', Georgia, serif;
@@ -185,14 +228,6 @@
   color: #c8952a;
 }
 
-.game-side-panel {
-  display: grid;
-  padding: 0.5rem;
-  overflow: hidden;
-  min-height: 0;
-  align-content: stretch;
-}
-
 .panel-section {
   border: 1px solid #3d2010;
   border-radius: 6px;
@@ -202,6 +237,10 @@
 
 .panel-section-status {
   padding: 0.42rem 0.52rem;
+}
+
+.panel-section-status .panel-note {
+  margin-top: 0.2rem;
 }
 
 .campaign-status-grid {
@@ -663,24 +702,20 @@ button:disabled {
 
 @media (max-width: 1180px) {
   .game-screen {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto;
+    grid-template-rows: auto auto auto;
     height: auto;
     min-height: 100dvh;
     overflow: auto;
   }
 
-  .game-tactical-column {
+  .game-top-row,
+  .game-bottom-row {
+    grid-template-columns: 1fr;
     grid-template-rows: auto auto auto;
   }
 
   .panel-divider {
     display: none;
-  }
-
-  .game-side-panel {
-    min-height: 0;
-    overflow: hidden;
   }
 
   .campaign-status-grid {
@@ -697,6 +732,12 @@ button:disabled {
 
   .vector-section-layout {
     grid-template-columns: 1fr;
+  }
+
+  .dashboard-panel,
+  .game-planning-panel,
+  .phase-board {
+    padding: 0.45rem;
   }
 
   .fit-scale-panel {
