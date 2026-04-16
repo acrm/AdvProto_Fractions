@@ -41,6 +41,11 @@ function formatSigned(value: number): string {
   return `${value >= 0 ? '+' : ''}${value.toFixed(2)}`
 }
 
+function shouldFlipLabel(angle: number): boolean {
+  const normalized = ((angle % 360) + 360) % 360
+  return normalized > 90 && normalized < 270
+}
+
 export function VectorStarControls({
   playerIntent,
   forecast,
@@ -104,11 +109,14 @@ export function VectorStarControls({
           const currentValue = playerIntent.adjustments[vector]
           const effectiveValue = forecast.normalizedAdjustments[vector]
           const targetFaction = nonPlayerFactions.find((faction) => faction.id === playerIntent.targets[vector])
-          const rayStyle = { '--ray-angle': `${VECTOR_ANGLES[vector]}deg` } as CSSProperties
+          const rayStyle = {
+            '--ray-angle': `${VECTOR_ANGLES[vector]}deg`,
+            '--label-flip': shouldFlipLabel(VECTOR_ANGLES[vector]) ? '180deg' : '0deg',
+          } as CSSProperties
 
           return (
             <div className="intent-ray" key={vector} style={rayStyle}>
-              <div className="intent-ray-label" title={VECTOR_HINTS[vector]}>
+              <div className={`intent-ray-label ${shouldFlipLabel(VECTOR_ANGLES[vector]) ? 'intent-ray-label-flipped' : ''}`} title={VECTOR_HINTS[vector]}>
                 <FontAwesomeIcon icon={VECTOR_ICONS[vector]} fixedWidth />
                 <span>{VECTOR_LABELS[vector]}</span>
               </div>

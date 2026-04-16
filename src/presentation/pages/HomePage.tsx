@@ -1,20 +1,20 @@
-import { type KeyboardEvent, useEffect, useRef, useState } from 'react'
+import { type CSSProperties, type KeyboardEvent, useEffect, useRef, useState } from 'react'
 import { useGameStore } from '../../application/useGameStore'
-import { Faction } from '../../domain/gameModel'
 import { CommandPlanningPanel } from '../components/CommandPlanningPanel'
-import { CampaignStatusPanel, FactionFocusPanel, FactionRosterPanel } from '../components/GameControlPanel'
+import { CampaignStatusPanel, FactionFocusPanel, FactionRosterPanel, SeasonIterationPanel } from '../components/GameControlPanel'
 import { PhaseSpaceChart } from '../components/PhaseSpaceChart'
 
 const DESKTOP_BREAKPOINT_PX = 1180
 const MIN_TOP_ROW_HEIGHT_PX = 170
 const MIN_BOTTOM_ROW_HEIGHT_PX = 360
-const MIN_STATUS_WIDTH_PX = 430
-const MIN_ROSTER_WIDTH_PX = 300
+const MIN_ROSTER_WIDTH_PX = 360
+const MIN_TOP_FOCUS_WIDTH_PX = 390
+const MIN_STATUS_WIDTH_PX = 360
 const MIN_PLANNING_WIDTH_PX = 360
 const MIN_CHART_WIDTH_PX = 520
-const MIN_FOCUS_WIDTH_PX = 360
+const MIN_SEASON_WIDTH_PX = 360
 
-type DragTarget = 'page-row' | 'top-row' | 'bottom-left' | 'bottom-right'
+type DragTarget = 'page-row' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
 
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value))
@@ -48,7 +48,8 @@ export function HomePage() {
   const topRowRef = useRef<HTMLElement | null>(null)
   const bottomRowRef = useRef<HTMLElement | null>(null)
   const [pageRowSplit, setPageRowSplit] = useState(0.3)
-  const [topRowSplit, setTopRowSplit] = useState(0.7)
+  const [topLeftSplit, setTopLeftSplit] = useState(0.34)
+  const [topRightSplit, setTopRightSplit] = useState(0.26)
   const [bottomLeftSplit, setBottomLeftSplit] = useState(0.28)
   const [bottomRightSplit, setBottomRightSplit] = useState(0.26)
   const [dragTarget, setDragTarget] = useState<DragTarget | null>(null)
@@ -69,12 +70,21 @@ export function HomePage() {
         return
       }
 
-      if (dragTarget === 'top-row') {
+      if (dragTarget === 'top-left') {
         const rect = topRowRef.current?.getBoundingClientRect()
         if (!rect) return
 
         const next = (event.clientX - rect.left) / rect.width
-        setTopRowSplit(clampSplit(next, rect.width, MIN_STATUS_WIDTH_PX, MIN_ROSTER_WIDTH_PX))
+        setTopLeftSplit(clampSplit(next, rect.width, MIN_ROSTER_WIDTH_PX, MIN_TOP_FOCUS_WIDTH_PX + MIN_STATUS_WIDTH_PX))
+        return
+      }
+
+      if (dragTarget === 'top-right') {
+        const rect = topRowRef.current?.getBoundingClientRect()
+        if (!rect) return
+
+        const nextRight = (rect.right - event.clientX) / rect.width
+        setTopRightSplit(clampSplit(nextRight, rect.width, MIN_STATUS_WIDTH_PX, MIN_ROSTER_WIDTH_PX + MIN_TOP_FOCUS_WIDTH_PX))
         return
       }
 
@@ -83,12 +93,12 @@ export function HomePage() {
 
       if (dragTarget === 'bottom-left') {
         const next = (event.clientX - rect.left) / rect.width
-        setBottomLeftSplit(clampSplit(next, rect.width, MIN_PLANNING_WIDTH_PX, MIN_CHART_WIDTH_PX + MIN_FOCUS_WIDTH_PX))
+        setBottomLeftSplit(clampSplit(next, rect.width, MIN_PLANNING_WIDTH_PX, MIN_CHART_WIDTH_PX + MIN_SEASON_WIDTH_PX))
         return
       }
 
       const nextRight = (rect.right - event.clientX) / rect.width
-      setBottomRightSplit(clampSplit(nextRight, rect.width, MIN_FOCUS_WIDTH_PX, MIN_PLANNING_WIDTH_PX + MIN_CHART_WIDTH_PX))
+      setBottomRightSplit(clampSplit(nextRight, rect.width, MIN_SEASON_WIDTH_PX, MIN_PLANNING_WIDTH_PX + MIN_CHART_WIDTH_PX))
     }
 
     const handlePointerUp = () => {
@@ -127,21 +137,28 @@ export function HomePage() {
     const rect = topRowRef.current?.getBoundingClientRect()
     if (!rect) return
 
-    setTopRowSplit((current) => clampSplit(current + deltaPx / rect.width, rect.width, MIN_STATUS_WIDTH_PX, MIN_ROSTER_WIDTH_PX))
+    setTopLeftSplit((current) => clampSplit(current + deltaPx / rect.width, rect.width, MIN_ROSTER_WIDTH_PX, MIN_TOP_FOCUS_WIDTH_PX + MIN_STATUS_WIDTH_PX))
+  }
+
+  const nudgeTopRightSplit = (deltaPx: number) => {
+    const rect = topRowRef.current?.getBoundingClientRect()
+    if (!rect) return
+
+    setTopRightSplit((current) => clampSplit(current - deltaPx / rect.width, rect.width, MIN_STATUS_WIDTH_PX, MIN_ROSTER_WIDTH_PX + MIN_TOP_FOCUS_WIDTH_PX))
   }
 
   const nudgeBottomLeftSplit = (deltaPx: number) => {
     const rect = bottomRowRef.current?.getBoundingClientRect()
     if (!rect) return
 
-    setBottomLeftSplit((current) => clampSplit(current + deltaPx / rect.width, rect.width, MIN_PLANNING_WIDTH_PX, MIN_CHART_WIDTH_PX + MIN_FOCUS_WIDTH_PX))
+    setBottomLeftSplit((current) => clampSplit(current + deltaPx / rect.width, rect.width, MIN_PLANNING_WIDTH_PX, MIN_CHART_WIDTH_PX + MIN_SEASON_WIDTH_PX))
   }
 
   const nudgeBottomRightSplit = (deltaPx: number) => {
     const rect = bottomRowRef.current?.getBoundingClientRect()
     if (!rect) return
 
-    setBottomRightSplit((current) => clampSplit(current - deltaPx / rect.width, rect.width, MIN_FOCUS_WIDTH_PX, MIN_PLANNING_WIDTH_PX + MIN_CHART_WIDTH_PX))
+    setBottomRightSplit((current) => clampSplit(current - deltaPx / rect.width, rect.width, MIN_SEASON_WIDTH_PX, MIN_PLANNING_WIDTH_PX + MIN_CHART_WIDTH_PX))
   }
 
   const handlePageDividerKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -155,7 +172,7 @@ export function HomePage() {
     }
   }
 
-  const handleTopDividerKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+  const handleTopLeftDividerKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'ArrowLeft') {
       event.preventDefault()
       nudgeTopRowSplit(-24)
@@ -163,6 +180,17 @@ export function HomePage() {
     if (event.key === 'ArrowRight') {
       event.preventDefault()
       nudgeTopRowSplit(24)
+    }
+  }
+
+  const handleTopRightDividerKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'ArrowLeft') {
+      event.preventDefault()
+      nudgeTopRightSplit(-24)
+    }
+    if (event.key === 'ArrowRight') {
+      event.preventDefault()
+      nudgeTopRightSplit(24)
     }
   }
 
@@ -196,37 +224,53 @@ export function HomePage() {
     <main
       className="game-screen"
       ref={screenRef}
-      style={{ '--page-top-size': `${(pageRowSplit * 100).toFixed(2)}%` } as React.CSSProperties}
+      style={{ '--page-top-size': `${(pageRowSplit * 100).toFixed(2)}%` } as CSSProperties}
     >
       <section
         className="game-top-row"
         ref={topRowRef}
-        style={{ '--top-left-size': `${(topRowSplit * 100).toFixed(2)}%` } as React.CSSProperties}
+        style={{
+          '--top-left-size': `${(topLeftSplit * 100).toFixed(2)}%`,
+          '--top-right-size': `${(topRightSplit * 100).toFixed(2)}%`,
+        } as CSSProperties}
       >
+          <FactionRosterPanel
+            gameState={gameState}
+            selectedFaction={selectedFaction}
+            onSelectFaction={selectFaction}
+          />
+
+          <div
+            aria-label="Resize faction list and faction focus panels"
+            aria-orientation="vertical"
+            className={`panel-divider panel-divider-vertical ${dragTarget === 'top-left' ? 'panel-divider-active' : ''}`}
+            onKeyDown={handleTopLeftDividerKeyDown}
+            onPointerDown={() => startResize('top-left')}
+            role="separator"
+            tabIndex={0}
+          >
+            <span className="panel-divider-handle" />
+          </div>
+
+          <FactionFocusPanel selectedFaction={selectedFaction} />
+
+          <div
+            aria-label="Resize faction focus and campaign status panels"
+            aria-orientation="vertical"
+            className={`panel-divider panel-divider-vertical ${dragTarget === 'top-right' ? 'panel-divider-active' : ''}`}
+            onKeyDown={handleTopRightDividerKeyDown}
+            onPointerDown={() => startResize('top-right')}
+            role="separator"
+            tabIndex={0}
+          >
+            <span className="panel-divider-handle" />
+          </div>
+
         <CampaignStatusPanel
           gameState={gameState}
-          selectedFaction={selectedFaction as Faction}
           onRunSession={playNextSession}
           onNewCampaign={() => startCampaign(Date.now())}
           onResetCampaign={resetCampaign}
-        />
-
-        <div
-          aria-label="Resize status and faction list panels"
-          aria-orientation="vertical"
-          className={`panel-divider panel-divider-vertical ${dragTarget === 'top-row' ? 'panel-divider-active' : ''}`}
-          onKeyDown={handleTopDividerKeyDown}
-          onPointerDown={() => startResize('top-row')}
-          role="separator"
-          tabIndex={0}
-        >
-          <span className="panel-divider-handle" />
-        </div>
-
-        <FactionRosterPanel
-          gameState={gameState}
-          selectedFaction={selectedFaction as Faction}
-          onSelectFaction={selectFaction}
         />
       </section>
 
@@ -248,7 +292,7 @@ export function HomePage() {
         style={{
           '--bottom-left-size': `${(bottomLeftSplit * 100).toFixed(2)}%`,
           '--bottom-right-size': `${(bottomRightSplit * 100).toFixed(2)}%`,
-        } as React.CSSProperties}
+        } as CSSProperties}
       >
         <CommandPlanningPanel
           factions={gameState.factions}
@@ -280,7 +324,7 @@ export function HomePage() {
         </section>
 
         <div
-          aria-label="Resize phase chart and faction focus panels"
+          aria-label="Resize phase chart and season summaries panels"
           aria-orientation="vertical"
           className={`panel-divider panel-divider-vertical ${dragTarget === 'bottom-right' ? 'panel-divider-active' : ''}`}
           onKeyDown={handleBottomRightDividerKeyDown}
@@ -291,9 +335,8 @@ export function HomePage() {
           <span className="panel-divider-handle" />
         </div>
 
-        <FactionFocusPanel
+        <SeasonIterationPanel
           gameState={gameState}
-          selectedFaction={selectedFaction as Faction}
         />
       </section>
     </main>

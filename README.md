@@ -54,11 +54,11 @@ Clean/DDD layers:
 - 3 to 5 objectives generated per faction each season.
 - Objective conflict classes: compatible, contested, mutually-exclusive.
 - Full single-screen tactical interface.
-- Top overview row split between campaign status and faction roster, with a bottom tactical row for command vector, phase chart, and faction focus.
+- Top overview row split into faction roster, faction focus, and campaign status, with a bottom tactical row for command vector, phase chart, and season iteration summaries.
 - Diagram plus side panel are constrained to the full viewport without page scrolling on desktop.
-- Desktop panel dividers are draggable, with chart, planning, and intel content proportionally scaled to stay fully visible inside each allocated zone.
+- Desktop panel dividers are draggable, with static dashboard panels proportionally scaled to stay fully visible inside each allocated zone.
 - Player-centered interactive phase board with cursor-centered zoom, pan, and faction selection.
-- Deep cursor-centered zoom with corrected pointer-space mapping for dense cluster inspection.
+- Deep cursor-centered zoom with SVG-native pointer-space mapping so interaction remains accurate after panel resizing.
 - Non-player factions start with distinct initial phase offsets around the player origin.
 - Resource-scaled faction dots with trajectory tails.
 - Direct player control through a star-shaped five-vector command interface with per-ray deterministic forecast values.

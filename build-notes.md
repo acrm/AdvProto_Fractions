@@ -29,3 +29,4 @@
 - 2026w10-0.27 — simplify command vector layout and separate star endpoints
 - 2026w10-0.28 — repack tactical screen blocks per scheme
 - 2026w10-0.29 — docs: add Northgate setting canon
+- 2026w10-0.30 — rebuild tactical dashboard and fix chart zoom

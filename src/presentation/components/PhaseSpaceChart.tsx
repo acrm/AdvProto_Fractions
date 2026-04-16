@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import type { PointerEvent as ReactPointerEvent } from 'react'
 import { ActivityVectorState, Faction } from '../../domain/gameModel'
 import { FactionIcon } from './FactionIcon'
-import { FitScalePanel } from './FitScalePanel'
 
 const DRAG_THRESHOLD_PX = 4
 const MIN_ZOOM = 0.2
@@ -24,19 +23,20 @@ function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value))
 }
 
-function mapClientPointToViewBox(
-  eventTarget: SVGSVGElement,
-  clientX: number,
-  clientY: number,
-  viewWidth: number,
-  viewHeight: number,
-): { x: number; y: number } {
-  const rect = eventTarget.getBoundingClientRect()
+function mapClientPointToSvgSpace(eventTarget: SVGSVGElement, clientX: number, clientY: number): { x: number; y: number } {
+  const matrix = eventTarget.getScreenCTM()
+  if (!matrix) {
+    const rect = eventTarget.getBoundingClientRect()
+    const viewBox = eventTarget.viewBox.baseVal
 
-  return {
-    x: ((clientX - rect.left) / rect.width) * viewWidth,
-    y: ((clientY - rect.top) / rect.height) * viewHeight,
+    return {
+      x: ((clientX - rect.left) / rect.width) * viewBox.width,
+      y: ((clientY - rect.top) / rect.height) * viewBox.height,
+    }
   }
+
+  const point = new DOMPoint(clientX, clientY).matrixTransform(matrix.inverse())
+  return { x: point.x, y: point.y }
 }
 
 function projectRelativePoint(
@@ -140,13 +140,7 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
     const handleNativeWheel = (event: WheelEvent) => {
       event.preventDefault()
 
-      const pointer = mapClientPointToViewBox(
-        element,
-        event.clientX,
-        event.clientY,
-        viewport.width,
-        viewport.height,
-      )
+      const pointer = mapClientPointToSvgSpace(element, event.clientX, event.clientY)
 
       setZoom((currentZoom) => {
         const nextZoom = clamp(
@@ -192,7 +186,7 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
   }
 
   const selectFactionAtPointer = (event: ReactPointerEvent<SVGSVGElement>) => {
-    const pointer = mapClientPointToViewBox(event.currentTarget, event.clientX, event.clientY, viewWidth, viewHeight)
+    const pointer = mapClientPointToSvgSpace(event.currentTarget, event.clientX, event.clientY)
     const candidates: Array<{ id: string; x: number; y: number; hitRadius: number }> = []
 
     candidates.push({
@@ -253,8 +247,8 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
     if (!dragMovedRef.current && Math.sqrt(dx * dx + dy * dy) > DRAG_THRESHOLD_PX) {
       dragMovedRef.current = true
     }
-    const pointer = mapClientPointToViewBox(event.currentTarget, event.clientX, event.clientY, viewWidth, viewHeight)
-    const originPointer = mapClientPointToViewBox(event.currentTarget, dragState.x, dragState.y, viewWidth, viewHeight)
+    const pointer = mapClientPointToSvgSpace(event.currentTarget, event.clientX, event.clientY)
+    const originPointer = mapClientPointToSvgSpace(event.currentTarget, dragState.x, dragState.y)
     const panDx = pointer.x - originPointer.x
     const panDy = pointer.y - originPointer.y
     setPan({
@@ -275,23 +269,22 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
 
   return (
     <div className="phase-board">
-      <FitScalePanel baseWidth={1080} baseHeight={760}>
-        <div className="phase-board-frame">
-          <div className="phase-canvas" ref={canvasRef}>
-            <svg
-              ref={svgRef}
-              width="100%"
-              height="100%"
-              viewBox={`0 0 ${viewWidth} ${viewHeight}`}
-              preserveAspectRatio="none"
-              role="img"
-              aria-label="Faction activity phase space chart centered on player position"
-              style={{ userSelect: 'none' }}
-              onPointerDown={handlePointerDown}
-              onPointerMove={handlePointerMove}
-              onPointerUp={handlePointerUp}
-              onPointerLeave={handlePointerUp}
-            >
+      <div className="phase-board-frame phase-board-frame-fluid">
+        <div className="phase-canvas" ref={canvasRef}>
+          <svg
+            ref={svgRef}
+            width="100%"
+            height="100%"
+            viewBox={`0 0 ${viewWidth} ${viewHeight}`}
+            preserveAspectRatio="xMidYMid meet"
+            role="img"
+            aria-label="Faction activity phase space chart centered on player position"
+            style={{ userSelect: 'none' }}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerLeave={handlePointerUp}
+          >
             <rect x={0} y={0} width={viewWidth} height={viewHeight} fill="#0e0804" rx={0} />
             <g transform={`translate(${pan.x}, ${pan.y})`}>
             <g transform={`scale(${zoom})`}>
@@ -399,10 +392,9 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
             ))}
             </g>
             </g>
-            </svg>
-          </div>
+          </svg>
         </div>
-      </FitScalePanel>
+      </div>
     </div>
   )
 }

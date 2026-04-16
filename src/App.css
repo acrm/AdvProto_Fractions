@@ -7,6 +7,8 @@
   --panel-divider-size: 0.75rem;
   --panel-divider-color: #5c3a14;
   --panel-divider-glow: rgba(200, 149, 42, 0.25);
+  --panel-type-large: clamp(0.98rem, 0.78rem + 0.38vw, 1.18rem);
+  --panel-type-body: clamp(0.92rem, 0.78rem + 0.22vw, 1.04rem);
 }
 
 .game-screen {
@@ -26,9 +28,11 @@
 .game-top-row {
   display: grid;
   grid-template-columns:
-    minmax(0, var(--top-left-size, 70%))
+    minmax(20rem, var(--top-left-size, 34%))
     var(--panel-divider-size)
-    minmax(18rem, calc(100% - var(--top-left-size, 70%) - var(--panel-divider-size)));
+    minmax(22rem, calc(100% - var(--top-left-size, 34%) - var(--top-right-size, 26%) - (2 * var(--panel-divider-size))))
+    var(--panel-divider-size)
+    minmax(20rem, var(--top-right-size, 26%));
   min-height: 0;
 }
 
@@ -52,7 +56,7 @@
   margin: 0 0 0.2rem;
   text-transform: uppercase;
   letter-spacing: 0.15em;
-  font-size: 0.7rem;
+  font-size: 0.82rem;
   color: #c8952a;
   font-family: 'Cinzel', Georgia, serif;
 }
@@ -91,7 +95,7 @@
 .dashboard-panel {
   display: grid;
   min-height: 0;
-  padding: 0.5rem;
+  padding: 0.6rem;
   overflow: hidden;
   align-content: stretch;
 }
@@ -119,9 +123,16 @@
 }
 
 .phase-board-frame {
-  width: 1080px;
-  height: 760px;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
   display: grid;
+}
+
+.phase-board-frame-fluid {
+  width: 100%;
+  height: 100%;
 }
 
 .game-planning-panel-content {
@@ -135,9 +146,10 @@
 
 .dashboard-status-content,
 .dashboard-roster-content,
-.dashboard-focus-content {
+.dashboard-focus-content,
+.dashboard-season-content {
   display: grid;
-  gap: 0.45rem;
+  gap: 0.7rem;
 }
 
 .dashboard-status-content {
@@ -164,6 +176,17 @@
   color: #f2e0bb;
   font-family: 'Cinzel', Georgia, serif;
   font-weight: 600;
+  font-size: clamp(1.3rem, 1rem + 0.55vw, 1.8rem);
+}
+
+.dashboard-panel p,
+.dashboard-panel li,
+.dashboard-panel strong,
+.dashboard-panel span,
+.game-planning-panel p,
+.game-planning-panel span,
+.phase-board text {
+  font-size: var(--panel-type-body);
 }
 
 .phase-canvas {
@@ -231,12 +254,12 @@
 .panel-section {
   border: 1px solid #3d2010;
   border-radius: 6px;
-  padding: 0.48rem;
+  padding: 0.7rem;
   background: rgba(18, 10, 4, 0.88);
 }
 
 .panel-section-status {
-  padding: 0.42rem 0.52rem;
+  padding: 0.62rem 0.7rem;
 }
 
 .panel-section-status .panel-note {
@@ -245,8 +268,8 @@
 
 .campaign-status-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(320px, 1.25fr);
-  gap: 0.4rem;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.8rem;
   align-items: start;
 }
 
@@ -268,20 +291,30 @@
 .forecast-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.7rem;
+  gap: 0.85rem;
+}
+
+.focus-summary-grid,
+.detail-grid-large {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
 }
 
 .hud-grid strong,
 .detail-grid strong,
-.forecast-grid strong {
+.forecast-grid strong,
+.focus-summary-grid strong,
+.detail-grid-large strong {
   color: #f2e0bb;
   display: block;
+  font-size: var(--panel-type-large);
 }
 
 .hud-label {
   display: block;
   margin-bottom: 0.2rem;
-  font-size: 0.68rem;
+  font-size: 0.76rem;
   color: #806040;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -312,7 +345,7 @@
 
 .intent-pool-label {
   color: #806040;
-  font-size: 0.7rem;
+  font-size: 0.82rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   font-family: 'Cinzel', Georgia, serif;
@@ -338,8 +371,8 @@
 .intent-star-board {
   position: relative;
   width: min(100%, 560px);
-  height: 460px;
-  min-height: 460px;
+  height: 500px;
+  min-height: 500px;
   margin: 0 auto;
 }
 
@@ -354,7 +387,7 @@
   position: absolute;
   left: 50%;
   top: calc(50% + 10px);
-  width: 220px;
+  width: 228px;
   height: 0;
   transform: rotate(var(--ray-angle));
   transform-origin: 0 0;
@@ -362,30 +395,37 @@
 
 .intent-ray-label {
   position: absolute;
-  left: 18px;
-  top: -30px;
+  left: 20px;
+  top: -34px;
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.35rem;
   color: #f0ddb8;
-  font-size: 0.64rem;
+  font-size: 0.74rem;
   font-family: 'Cinzel', Georgia, serif;
   line-height: 1;
   white-space: nowrap;
   pointer-events: none;
   z-index: 2;
+  transform-origin: center center;
+  transform: rotate(var(--label-flip, 0deg));
+}
+
+.intent-ray-label-flipped {
+  left: 10px;
+  top: -12px;
 }
 
 .intent-ray-track {
   position: absolute;
-  left: 18px;
+  left: 20px;
   top: -10px;
-  width: 170px;
+  width: 176px;
   z-index: 5;
 }
 
 .intent-ray-slider {
-  width: 170px;
+  width: 176px;
   margin: 0;
   accent-color: #c8952a;
   position: relative;
@@ -394,12 +434,12 @@
 
 .intent-ray-end {
   position: absolute;
-  left: 214px;
+  left: 222px;
   top: 0;
   transform: translate(-50%, -50%) rotate(calc(-1 * var(--ray-angle)));
   display: grid;
   justify-items: center;
-  gap: 0.24rem;
+  gap: 0.34rem;
   z-index: 3;
 }
 
@@ -415,7 +455,7 @@
 
 .intent-ray-value,
 .intent-ray-effective {
-  font-size: 0.64rem;
+  font-size: 0.72rem;
   color: #c8952a;
   line-height: 1;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.55);
@@ -460,8 +500,8 @@ button.faction-token {
 }
 
 button.faction-token-dot {
-  width: 1.6rem;
-  height: 1.6rem;
+  width: 1.85rem;
+  height: 1.85rem;
   border-radius: 50%;
   padding: 0;
   justify-content: center;
@@ -477,8 +517,8 @@ button.faction-token-dot .faction-token-icon {
 }
 
 button.faction-token-assigned {
-  width: 1.9rem;
-  height: 1.9rem;
+  width: 2.15rem;
+  height: 2.15rem;
   margin: 0 auto;
 }
 
@@ -486,9 +526,9 @@ button.faction-token-assigned {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 0.88rem;
-  height: 0.88rem;
-  flex: 0 0 0.88rem;
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 1rem;
   color: #c8952a;
 }
 
@@ -511,23 +551,26 @@ button.faction-token-assigned {
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 0.2rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.55rem;
 }
 
 .faction-roster-item {
   width: 100%;
   display: grid;
-  grid-template-columns: 1.45rem minmax(0, 1fr);
+  grid-template-columns: 2.2rem minmax(0, 1fr);
   align-items: center;
-  gap: 0.32rem;
+  gap: 0.65rem;
   text-align: left;
   background: rgba(18, 10, 4, 0.78);
   border-color: #3d2010;
+  padding: 0.8rem 0.85rem;
+  min-height: 4.5rem;
 }
 
 .faction-list-token {
-  width: 1.3rem;
-  height: 1.3rem;
+  width: 2rem;
+  height: 2rem;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
@@ -543,6 +586,41 @@ button.faction-token-assigned {
 .faction-roster-item-active {
   border-color: #c8952a;
   box-shadow: 0 0 0 1px rgba(200, 149, 42, 0.2);
+}
+
+.faction-roster-copy {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.faction-roster-name {
+  color: #f2e0bb;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 1rem;
+}
+
+.faction-roster-subline {
+  color: #a08060;
+  text-transform: capitalize;
+  font-size: 0.82rem;
+}
+
+.season-iteration-list {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.season-iteration-card {
+  border: 1px solid #3d2010;
+  border-radius: 6px;
+  padding: 0.7rem 0.8rem;
+  background: rgba(14, 8, 4, 0.84);
+}
+
+.season-iteration-text {
+  color: #d8c39b;
+  line-height: 1.45;
+  margin: 0;
 }
 
 .faction-roster-color {
@@ -652,7 +730,7 @@ button {
   font-weight: 600;
   cursor: pointer;
   font-family: 'Cinzel', Georgia, serif;
-  font-size: 0.64rem;
+  font-size: 0.78rem;
   letter-spacing: 0.04em;
   transition: border-color 0.15s, background 0.15s;
 }
@@ -682,6 +760,7 @@ button:disabled {
   margin: 0;
   padding-left: 1rem;
   color: #c8a870;
+  font-size: var(--panel-type-body);
 }
 
 .compact-list li {
@@ -711,7 +790,7 @@ button:disabled {
   .game-top-row,
   .game-bottom-row {
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto;
+    grid-auto-rows: auto;
   }
 
   .panel-divider {
@@ -773,6 +852,11 @@ button:disabled {
     font-size: 0.6rem;
   }
 
+  .intent-ray-label-flipped {
+    top: -6px;
+    left: 8px;
+  }
+
   .intent-ray-track {
     left: 14px;
     width: 134px;
@@ -802,5 +886,14 @@ button:disabled {
 
   .phase-board {
     min-height: 18rem;
+  }
+
+  .faction-roster-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .focus-summary-grid,
+  .detail-grid-large {
+    grid-template-columns: 1fr;
   }
 }
