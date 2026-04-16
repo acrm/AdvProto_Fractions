@@ -3,9 +3,18 @@
   height: 100dvh;
 }
 
+:root {
+  --panel-divider-size: 0.75rem;
+  --panel-divider-color: #5c3a14;
+  --panel-divider-glow: rgba(200, 149, 42, 0.25);
+}
+
 .game-screen {
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(22rem, 0.85fr);
+  grid-template-columns:
+    minmax(0, var(--screen-left-size, 60%))
+    var(--panel-divider-size)
+    minmax(22rem, calc(100% - var(--screen-left-size, 60%) - var(--panel-divider-size)));
   gap: 0;
   height: 100dvh;
   padding: 0;
@@ -15,9 +24,11 @@
 
 .game-tactical-column {
   display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-rows:
+    minmax(0, var(--tactical-top-size, 62%))
+    var(--panel-divider-size)
+    minmax(14rem, calc(100% - var(--tactical-top-size, 62%) - var(--panel-divider-size)));
   min-height: 0;
-  border-right: 1px solid #5c3a14;
 }
 
 .game-board-column {
@@ -55,16 +66,53 @@
   min-height: 0;
   padding: 0.75rem;
   overflow: hidden;
-  border-right: none;
-  border-bottom: 1px solid #5c3a14;
 }
 
 .game-planning-panel {
   display: grid;
   min-height: 0;
   padding: 0.75rem;
-  overflow: auto;
-  align-content: start;
+  overflow: hidden;
+  align-content: stretch;
+}
+
+.fit-scale-panel {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.fit-scale-stage {
+  position: relative;
+}
+
+.fit-scale-transform {
+  transform-origin: top left;
+}
+
+.fit-scale-content {
+  min-height: 0;
+}
+
+.phase-board-frame {
+  width: 1080px;
+  height: 760px;
+  display: grid;
+}
+
+.game-planning-panel-content {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.game-side-panel-content {
+  display: grid;
+  gap: 0.45rem;
+  grid-template-rows: auto auto minmax(0, 1fr);
 }
 
 .game-side-panel h2,
@@ -139,12 +187,10 @@
 
 .game-side-panel {
   display: grid;
-  gap: 0.45rem;
   padding: 0.5rem;
   overflow: hidden;
   min-height: 0;
-  align-content: start;
-  grid-template-rows: auto auto minmax(0, 1fr);
+  align-content: stretch;
 }
 
 .panel-section {
@@ -222,8 +268,8 @@
 .panel-section-list,
 .panel-section-command {
   min-height: 0;
-  overflow: auto;
-  max-height: 44dvh;
+  overflow: visible;
+  max-height: none;
 }
 
 .vector-section-layout {
@@ -463,7 +509,72 @@ button.faction-token-assigned {
 
 .panel-section-fill {
   min-height: 0;
-  overflow: auto;
+  overflow: visible;
+}
+
+.panel-divider {
+  position: relative;
+  display: grid;
+  place-items: center;
+  background:
+    linear-gradient(180deg, transparent 0%, rgba(92, 58, 20, 0.35) 18%, rgba(92, 58, 20, 0.35) 82%, transparent 100%);
+  touch-action: none;
+  outline: none;
+}
+
+.panel-divider::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent, var(--panel-divider-glow), transparent);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.panel-divider:hover::before,
+.panel-divider:focus-visible::before,
+.panel-divider-active::before {
+  opacity: 1;
+}
+
+.panel-divider-vertical {
+  cursor: col-resize;
+}
+
+.panel-divider-horizontal {
+  cursor: row-resize;
+  background:
+    linear-gradient(90deg, transparent 0%, rgba(92, 58, 20, 0.35) 18%, rgba(92, 58, 20, 0.35) 82%, transparent 100%);
+}
+
+.panel-divider-handle {
+  display: block;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #d1aa60 0%, #8d5f24 100%);
+  box-shadow: 0 0 0 1px rgba(40, 20, 8, 0.85), 0 0 18px rgba(200, 149, 42, 0.22);
+}
+
+.panel-divider-vertical .panel-divider-handle {
+  width: 0.28rem;
+  height: 4.5rem;
+}
+
+.panel-divider-horizontal .panel-divider-handle {
+  width: 4.5rem;
+  height: 0.28rem;
+}
+
+.panel-resizing,
+.panel-resizing * {
+  user-select: none !important;
+}
+
+.panel-resizing-column {
+  cursor: col-resize;
+}
+
+.panel-resizing-row {
+  cursor: row-resize;
 }
 
 .phase-faction-glyph {
@@ -554,14 +665,16 @@ button:disabled {
   }
 
   .game-tactical-column {
-    border-right: none;
-    border-bottom: 1px solid #5c3a14;
+    grid-template-rows: auto auto auto;
+  }
+
+  .panel-divider {
+    display: none;
   }
 
   .game-side-panel {
     min-height: 0;
-    overflow: auto;
-    grid-template-rows: auto auto auto;
+    overflow: hidden;
   }
 
   .campaign-status-grid {
@@ -582,6 +695,23 @@ button:disabled {
 
   .vector-section-summary .forecast-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fit-scale-panel {
+    place-items: stretch;
+  }
+
+  .fit-scale-stage,
+  .fit-scale-transform {
+    width: 100% !important;
+    height: auto !important;
+    transform: none !important;
+  }
+
+  .fit-scale-content,
+  .phase-board-frame {
+    width: 100% !important;
+    height: auto !important;
   }
 
   .intent-star-board {
@@ -621,6 +751,6 @@ button:disabled {
   }
 
   .phase-board {
-    border-bottom: 1px solid #5c3a14;
+    min-height: 18rem;
   }
 }

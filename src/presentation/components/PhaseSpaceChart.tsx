@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { PointerEvent as ReactPointerEvent } from 'react'
 import { ActivityVectorState, Faction } from '../../domain/gameModel'
 import { FactionIcon } from './FactionIcon'
+import { FitScalePanel } from './FitScalePanel'
 
 const DRAG_THRESHOLD_PX = 4
 const MIN_ZOOM = 0.2
@@ -274,130 +275,134 @@ export function PhaseSpaceChart({ factions, selectedFactionId, onSelectFaction }
 
   return (
     <div className="phase-board">
-      <div className="phase-canvas" ref={canvasRef}>
-        <svg
-          ref={svgRef}
-          width="100%"
-          height="100%"
-          viewBox={`0 0 ${viewWidth} ${viewHeight}`}
-          preserveAspectRatio="none"
-          role="img"
-          aria-label="Faction activity phase space chart centered on player position"
-          style={{ userSelect: 'none' }}
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onPointerLeave={handlePointerUp}
-        >
-        <rect x={0} y={0} width={viewWidth} height={viewHeight} fill="#0e0804" rx={0} />
-        <g transform={`translate(${pan.x}, ${pan.y})`}>
-        <g transform={`scale(${zoom})`}>
-        {[0.25, 0.5, 0.75, 1].map((ratio) => (
-          <circle
-            key={ratio}
-            cx={centerX}
-            cy={centerY}
-            r={baseRadius * ratio}
-            fill="none"
-            stroke="#3a2310"
-            strokeWidth={1 / zoom}
-          />
-        ))}
+      <FitScalePanel baseWidth={1080} baseHeight={760}>
+        <div className="phase-board-frame">
+          <div className="phase-canvas" ref={canvasRef}>
+            <svg
+              ref={svgRef}
+              width="100%"
+              height="100%"
+              viewBox={`0 0 ${viewWidth} ${viewHeight}`}
+              preserveAspectRatio="none"
+              role="img"
+              aria-label="Faction activity phase space chart centered on player position"
+              style={{ userSelect: 'none' }}
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+              onPointerLeave={handlePointerUp}
+            >
+            <rect x={0} y={0} width={viewWidth} height={viewHeight} fill="#0e0804" rx={0} />
+            <g transform={`translate(${pan.x}, ${pan.y})`}>
+            <g transform={`scale(${zoom})`}>
+            {[0.25, 0.5, 0.75, 1].map((ratio) => (
+              <circle
+                key={ratio}
+                cx={centerX}
+                cy={centerY}
+                r={baseRadius * ratio}
+                fill="none"
+                stroke="#3a2310"
+                strokeWidth={1 / zoom}
+              />
+            ))}
 
-        <line x1={centerX - baseRadius} y1={centerY} x2={centerX + baseRadius} y2={centerY} stroke="#4a3018" strokeWidth={1.2 / zoom} />
-        <line x1={centerX} y1={centerY - baseRadius} x2={centerX} y2={centerY + baseRadius} stroke="#4a3018" strokeWidth={1.2 / zoom} />
+            <line x1={centerX - baseRadius} y1={centerY} x2={centerX + baseRadius} y2={centerY} stroke="#4a3018" strokeWidth={1.2 / zoom} />
+            <line x1={centerX} y1={centerY - baseRadius} x2={centerX} y2={centerY + baseRadius} stroke="#4a3018" strokeWidth={1.2 / zoom} />
 
-        <text x={centerX + baseRadius + 18 / zoom} y={centerY + 5 / zoom} fontSize={15 / zoom} fill="#c8a870">
-          +Economic / +Diplomatic
-        </text>
-        <text x={centerX - baseRadius - 18 / zoom} y={centerY + 5 / zoom} textAnchor="end" fontSize={15 / zoom} fill="#c8a870">
-          -Economic / -Diplomatic
-        </text>
-        <text x={centerX + 2 / zoom} y={centerY - baseRadius - 18 / zoom} textAnchor="middle" fontSize={15 / zoom} fill="#c8a870">
-          +Covert / +Deterrence
-        </text>
-        <text x={centerX + 2 / zoom} y={centerY + baseRadius + 24 / zoom} textAnchor="middle" fontSize={15 / zoom} fill="#c8a870">
-          -Covert / -Deterrence
-        </text>
+            <text x={centerX + baseRadius + 18 / zoom} y={centerY + 5 / zoom} fontSize={15 / zoom} fill="#c8a870">
+              +Economic / +Diplomatic
+            </text>
+            <text x={centerX - baseRadius - 18 / zoom} y={centerY + 5 / zoom} textAnchor="end" fontSize={15 / zoom} fill="#c8a870">
+              -Economic / -Diplomatic
+            </text>
+            <text x={centerX + 2 / zoom} y={centerY - baseRadius - 18 / zoom} textAnchor="middle" fontSize={15 / zoom} fill="#c8a870">
+              +Covert / +Deterrence
+            </text>
+            <text x={centerX + 2 / zoom} y={centerY + baseRadius + 24 / zoom} textAnchor="middle" fontSize={15 / zoom} fill="#c8a870">
+              -Covert / -Deterrence
+            </text>
 
-        <circle cx={centerX} cy={centerY} r={10 / zoom} fill={factionColorById[playerFaction.id]} stroke={selectedFactionId === playerFaction.id ? '#f0d898' : '#c8952a'} strokeWidth={2.5 / zoom} />
-        <circle cx={centerX} cy={centerY} r={18 / zoom} fill="none" stroke={selectedFactionId === playerFaction.id ? '#d4982a' : '#e8c870'} strokeWidth={3.2 / zoom} strokeOpacity={0.95} />
-        <foreignObject x={centerX - 7 / zoom} y={centerY - 7 / zoom} width={14 / zoom} height={14 / zoom} pointerEvents="none">
-          <div className="phase-faction-glyph">
-            <FactionIcon className="phase-faction-glyph-icon" name={playerFaction.icon} />
-          </div>
-        </foreignObject>
+            <circle cx={centerX} cy={centerY} r={10 / zoom} fill={factionColorById[playerFaction.id]} stroke={selectedFactionId === playerFaction.id ? '#f0d898' : '#c8952a'} strokeWidth={2.5 / zoom} />
+            <circle cx={centerX} cy={centerY} r={18 / zoom} fill="none" stroke={selectedFactionId === playerFaction.id ? '#d4982a' : '#e8c870'} strokeWidth={3.2 / zoom} strokeOpacity={0.95} />
+            <foreignObject x={centerX - 7 / zoom} y={centerY - 7 / zoom} width={14 / zoom} height={14 / zoom} pointerEvents="none">
+              <div className="phase-faction-glyph">
+                <FactionIcon className="phase-faction-glyph-icon" name={playerFaction.icon} />
+              </div>
+            </foreignObject>
 
-        {factions.map((faction, index) => (
-          <g key={faction.id}>
-            {!faction.isPlayer && (() => {
-              const points = trajectoryPoints(faction, playerFaction, baseRadius, centerX, centerY)
-              if (points.length === 0) return null
-              const highlight = selectedFactionId === faction.id
-              const currentPoint = points[points.length - 1]
-              const radius = pointRadius(faction.resourceStock, maxResource)
-              const rScaled = radius / zoom
-              const rTrail = Math.max(2, radius * 0.48) / zoom
+            {factions.map((faction, index) => (
+              <g key={faction.id}>
+                {!faction.isPlayer && (() => {
+                  const points = trajectoryPoints(faction, playerFaction, baseRadius, centerX, centerY)
+                  if (points.length === 0) return null
+                  const highlight = selectedFactionId === faction.id
+                  const currentPoint = points[points.length - 1]
+                  const radius = pointRadius(faction.resourceStock, maxResource)
+                  const rScaled = radius / zoom
+                  const rTrail = Math.max(2, radius * 0.48) / zoom
 
-              return (
-                <>
-                  <polyline
-                    points={points.map((point) => `${point.x},${point.y}`).join(' ')}
-                    fill="none"
-                    stroke={COLORS[index % COLORS.length]}
-                    strokeWidth={(highlight ? 5 : 3) / zoom}
-                    strokeOpacity={highlight ? 0.95 : 0.5}
-                  />
-                  <polyline
-                    points={points.map((point) => `${point.x},${point.y}`).join(' ')}
-                    fill="none"
-                    stroke="transparent"
-                    strokeWidth={28 / zoom}
-                  />
-                  {points.map((point, pointIndex) => (
-                    <g key={`${faction.id}-trail-${pointIndex}`}>
-                      <circle
-                        cx={point.x}
-                        cy={point.y}
-                        r={pointIndex === points.length - 1 ? rScaled : rTrail}
-                        fill={factionColorById[faction.id]}
-                        fillOpacity={point.opacity}
-                        stroke={highlight ? '#f0d898' : '#c8a870'}
-                        strokeWidth={(pointIndex === points.length - 1 ? 2.3 : 1.2) / zoom}
-                      />
-                      {pointIndex === points.length - 1 ? (
-                        <foreignObject x={point.x - 7 / zoom} y={point.y - 7 / zoom} width={14 / zoom} height={14 / zoom} pointerEvents="none">
-                          <div className="phase-faction-glyph">
-                            <FactionIcon className="phase-faction-glyph-icon" name={faction.icon} />
-                          </div>
-                        </foreignObject>
-                      ) : null}
-                    </g>
-                  ))}
-                  {highlight ? (
+                  return (
                     <>
-                      <circle
-                        cx={currentPoint.x}
-                        cy={currentPoint.y}
-                        r={rScaled + 7 / zoom}
+                      <polyline
+                        points={points.map((point) => `${point.x},${point.y}`).join(' ')}
                         fill="none"
-                        stroke="#d4982a"
-                        strokeWidth={2.4 / zoom}
+                        stroke={COLORS[index % COLORS.length]}
+                        strokeWidth={(highlight ? 5 : 3) / zoom}
+                        strokeOpacity={highlight ? 0.95 : 0.5}
                       />
-                      <text x={currentPoint.x + rScaled + 12 / zoom} y={currentPoint.y - rScaled - 8 / zoom} fontSize={14 / zoom} fill="#f0d898">
-                        {faction.name}
-                      </text>
+                      <polyline
+                        points={points.map((point) => `${point.x},${point.y}`).join(' ')}
+                        fill="none"
+                        stroke="transparent"
+                        strokeWidth={28 / zoom}
+                      />
+                      {points.map((point, pointIndex) => (
+                        <g key={`${faction.id}-trail-${pointIndex}`}>
+                          <circle
+                            cx={point.x}
+                            cy={point.y}
+                            r={pointIndex === points.length - 1 ? rScaled : rTrail}
+                            fill={factionColorById[faction.id]}
+                            fillOpacity={point.opacity}
+                            stroke={highlight ? '#f0d898' : '#c8a870'}
+                            strokeWidth={(pointIndex === points.length - 1 ? 2.3 : 1.2) / zoom}
+                          />
+                          {pointIndex === points.length - 1 ? (
+                            <foreignObject x={point.x - 7 / zoom} y={point.y - 7 / zoom} width={14 / zoom} height={14 / zoom} pointerEvents="none">
+                              <div className="phase-faction-glyph">
+                                <FactionIcon className="phase-faction-glyph-icon" name={faction.icon} />
+                              </div>
+                            </foreignObject>
+                          ) : null}
+                        </g>
+                      ))}
+                      {highlight ? (
+                        <>
+                          <circle
+                            cx={currentPoint.x}
+                            cy={currentPoint.y}
+                            r={rScaled + 7 / zoom}
+                            fill="none"
+                            stroke="#d4982a"
+                            strokeWidth={2.4 / zoom}
+                          />
+                          <text x={currentPoint.x + rScaled + 12 / zoom} y={currentPoint.y - rScaled - 8 / zoom} fontSize={14 / zoom} fill="#f0d898">
+                            {faction.name}
+                          </text>
+                        </>
+                      ) : null}
                     </>
-                  ) : null}
-                </>
-              )
-            })()}
-          </g>
-        ))}
-        </g>
-        </g>
-        </svg>
-      </div>
+                  )
+                })()}
+              </g>
+            ))}
+            </g>
+            </g>
+            </svg>
+          </div>
+        </div>
+      </FitScalePanel>
     </div>
   )
 }

@@ -25,3 +25,4 @@
 - 2026w10-0.23 — remove vector plaques and make sliders primary with end token sockets
 - 2026w10-0.24 — fix passive wheel listener warning on phase chart
 - 2026w10-0.25 — move command planning below phase chart
+- 2026w10-0.26 — add draggable panel splitters with fit scaling

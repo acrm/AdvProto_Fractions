@@ -64,6 +64,8 @@ All factions are represented in a phase-space with vectors in range -100 to 100:
 ## Command Panel Rules
 - The left tactical column is vertically split into the live phase chart and the command planning controls.
 - The right panel combines campaign summary, faction roster, selected faction detail, recent intel, and resolution feed.
+- Desktop dividers between the three panel zones are draggable.
+- When a panel is resized, its content should keep its proportions and scale down to remain fully visible within the assigned area instead of relying on internal scrolling.
 - It should foreground faction doctrine, home base, leadership, and current agenda alongside raw metrics.
 - The player can set signed intent values for each of the 5 vectors before resolving the next session.
 - A deterministic forecast shows projected player vectors, resource delta, exposure delta, and score pressure.

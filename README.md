@@ -56,6 +56,7 @@ Clean/DDD layers:
 - Full single-screen tactical interface.
 - Left tactical column split into live phase chart above and command planning below, with the intelligence panel on the right.
 - Diagram plus side panel are constrained to the full viewport without page scrolling on desktop.
+- Desktop panel dividers are draggable, with chart, planning, and intel content proportionally scaled to stay fully visible inside each allocated zone.
 - Player-centered interactive phase board with cursor-centered zoom, pan, and faction selection.
 - Deep cursor-centered zoom with corrected pointer-space mapping for dense cluster inspection.
 - Non-player factions start with distinct initial phase offsets around the player origin.
